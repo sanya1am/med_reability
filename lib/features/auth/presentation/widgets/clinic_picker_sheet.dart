@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../utils/assets/app_assets.dart';
 import '../../domain/entities/clinic.dart';
 import '../view_model/auth_view_model.dart';
 
@@ -75,9 +77,15 @@ class _ClinicPickerSheetState extends ConsumerState<ClinicPickerSheet> {
           children: [
             TextField(
               controller: _searchCtrl,
-              decoration: const InputDecoration(
+              style: Theme.of(context).textTheme.bodySmall,
+              decoration: InputDecoration(
                 labelText: 'Поиск поликлиники',
-                prefixIcon: Icon(Icons.search),
+                labelStyle: Theme.of(context).textTheme.bodySmall,
+                prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(left: 12, right: 8),
+                  child: SvgPicture.asset(AppAssets.searchIcon, fit: BoxFit.scaleDown),
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -101,7 +109,7 @@ class _ClinicPickerSheetState extends ConsumerState<ClinicPickerSheet> {
                   itemBuilder: (_, i) {
                     final c = _items[i];
                     return ListTile(
-                      title: Text(c.name),
+                      title: Text(c.name, style: Theme.of(context).textTheme.bodySmall),
                       onTap: () => Navigator.of(context).pop<Clinic>(c),
                     );
                   },

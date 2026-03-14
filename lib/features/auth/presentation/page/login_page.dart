@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:med_reability/features/auth/presentation/widgets/login_button.dart';
+import '../../../../utils/assets/app_assets.dart';
 import '../view_model/auth_view_model.dart';
 import '../widgets/clinic_picker_sheet.dart';
 import '../../domain/entities/clinic.dart';
@@ -33,65 +35,77 @@ class LoginPage extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Авторизация',
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 24),
-                const Align(
+                Text('Авторизация', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 48),
+                Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Введите свои данные', style: TextStyle(fontSize: 20)),
+                  child: Text('Введите свои данные', style: Theme.of(context).textTheme.bodyMedium),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
 
                 TextField(
                   onChanged: vm.setEmail,
-                  style: TextStyle(fontSize: 20),
-                  decoration: const InputDecoration(
+                  style: TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
                     hintText: 'Почта',
-                    hintStyle: TextStyle(fontSize: 20),
-                    prefixIcon: Icon(Icons.mail),
+                    contentPadding: EdgeInsets.symmetric(vertical: 13, horizontal: 12),
+                    prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.only(left: 12, right: 8),
+                      child: SvgPicture.asset(AppAssets.emailIcon, fit: BoxFit.scaleDown),
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(14)),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
                 TextField(
                   onChanged: vm.setPassword,
                   obscureText: true,
-                  style: TextStyle(fontSize: 20),
-                  decoration: const InputDecoration(
+                  style: TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
                     hintText: 'Пароль',
-                    hintStyle: TextStyle(fontSize: 20),
-                    prefixIcon: Icon(Icons.key),
+                    contentPadding: EdgeInsets.symmetric(vertical: 13, horizontal: 12),
+                    prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.only(left: 12, right: 8),
+                      child: SvgPicture.asset(AppAssets.passwordIcon, fit: BoxFit.scaleDown),
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(14)),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
-                const Align(
+                const SizedBox(height: 24),
+                Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Укажите поликлинику', style: TextStyle(fontSize: 20)),
+                  child: Text('Укажите поликлинику', style: Theme.of(context).textTheme.bodyMedium),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
 
                 InkWell(
                   onTap: () => _pickClinic(context, ref),
                   child: InputDecorator(
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Поликлиника',
-                      hintStyle: TextStyle(fontSize: 20),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                    isEmpty: auth.selectedClinic == null,
+                    decoration: InputDecoration(
+                      prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.only(left: 12, right: 8),
+                        child: SvgPicture.asset(AppAssets.searchIcon, fit: BoxFit.scaleDown),
                       ),
+                      hintText: 'Поликлиника',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: Text(auth.selectedClinic?.name ?? '', style: TextStyle(fontSize: 20)),
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 32),
 
                 LoginButton(
                   onPressed: auth.loading ? () {} : vm.login,
