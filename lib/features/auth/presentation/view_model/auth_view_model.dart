@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../domain/entities/session.dart';
 import '../state/auth_ui_state.dart';
 import '../../domain/entities/clinic.dart';
 import '../../domain/use_case/login_use_case.dart';
@@ -41,6 +42,12 @@ class AuthViewModel extends Notifier<AuthUiState> {
         email: state.email.trim(),
         password: state.password,
         clinicId: state.selectedClinic!.id,
+      );
+      final fixedSession = AuthSession(
+        token: session.token,
+        clinic: Clinic(id: session.clinic.id, name: state.selectedClinic!.name),
+        role: session.role,
+        userId: session.userId,
       );
       state = state.copyWith(loading: false, session: session);
     } catch (_) {
