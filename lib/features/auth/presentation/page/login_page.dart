@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:med_reability/features/auth/presentation/widgets/login_button.dart';
+import 'package:med_reability/utils/widgets/app_text_field.dart';
+import 'package:med_reability/utils/widgets/primary_button.dart';
 import '../../../../utils/assets/app_assets.dart';
 import '../view_model/auth_view_model.dart';
 import '../widgets/clinic_picker_sheet.dart';
@@ -43,42 +45,20 @@ class LoginPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
 
-                TextField(
+                AppTextField(
+                  hintText: 'Почта',
+                  prefixIcon: SvgPicture.asset(AppAssets.emailIcon, fit: BoxFit.scaleDown),
                   onChanged: vm.setEmail,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    hintText: 'Почта',
-                    contentPadding: EdgeInsets.symmetric(vertical: 13, horizontal: 12),
-                    prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                    prefixIcon: Padding(
-                      padding: const EdgeInsets.only(left: 12, right: 8),
-                      child: SvgPicture.asset(AppAssets.emailIcon, fit: BoxFit.scaleDown),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                    ),
-                  ),
                 ),
                 const SizedBox(height: 16),
-                TextField(
-                  onChanged: vm.setPassword,
+                AppTextField(
+                  hintText: 'Пароль',
+                  prefixIcon: SvgPicture.asset(AppAssets.passwordIcon, fit: BoxFit.scaleDown),
                   obscureText: true,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    hintText: 'Пароль',
-                    contentPadding: EdgeInsets.symmetric(vertical: 13, horizontal: 12),
-                    prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                    prefixIcon: Padding(
-                      padding: const EdgeInsets.only(left: 12, right: 8),
-                      child: SvgPicture.asset(AppAssets.passwordIcon, fit: BoxFit.scaleDown),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                    ),
-                  ),
+                  onChanged: vm.setPassword,
                 ),
-
                 const SizedBox(height: 24),
+
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text('Укажите поликлинику', style: Theme.of(context).textTheme.bodyMedium),
@@ -107,8 +87,11 @@ class LoginPage extends ConsumerWidget {
 
                 const SizedBox(height: 32),
 
-                LoginButton(
-                  onPressed: auth.loading ? () {} : vm.login,
+                PrimaryButton(
+                  text: 'Войти',
+                  loading: auth.loading,
+                  onPressed: vm.login,
+                  textStyle: Theme.of(context).textTheme.titleMedium,
                 ),
 
                 if (auth.error != null) ...[
