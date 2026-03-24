@@ -31,8 +31,10 @@ class ClinicUserDto {
   final String clinicId;
   final String email;
   final String firstName;
+  final String patronymic;
   final String lastName;
   final String role;
+  final String phoneNumber;
   final bool isActive;
 
   ClinicUserDto({
@@ -40,8 +42,10 @@ class ClinicUserDto {
     required this.clinicId,
     required this.email,
     required this.firstName,
+    required this.patronymic,
     required this.lastName,
     required this.role,
+    required this.phoneNumber,
     required this.isActive,
   });
 
@@ -50,8 +54,10 @@ class ClinicUserDto {
     clinicId: json['clinicId'] as String,
     email: json['email'] as String,
     firstName: (json['firstName'] ?? '') as String,
+    patronymic: (json['patronymic'] ?? '') as String,
     lastName: (json['lastName'] ?? '') as String,
     role: (json['role'] ?? '') as String,
+    phoneNumber: (json['phoneNumber'] ?? '') as String,
     isActive: (json['isActive'] ?? false) as bool,
   );
 
@@ -100,9 +106,9 @@ Map<String, dynamic> createUserBody({
   required String email,
   required String password,
   required String firstName,
-  required String lastName,
   required String patronymic,
-  String? phoneNumber,
+  required String lastName,
+  required String phoneNumber,
   required UserRole role,
 }) {
   return {
@@ -111,7 +117,7 @@ Map<String, dynamic> createUserBody({
     'firstName': firstName,
     'patronymic': patronymic,
     'lastName': lastName,
-    'phoneNumber': phoneNumber ?? '',
+    'phoneNumber': phoneNumber,
     'role': _roleToApi(role),
   };
 }

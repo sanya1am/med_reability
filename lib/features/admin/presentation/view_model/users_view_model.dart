@@ -10,6 +10,10 @@ class UsersViewModel extends AsyncNotifier<UsersState> {
   late final listUsers = ref.read(listUsersUseCaseProvider);
   late final createUser = ref.read(createUserUseCaseProvider);
   late final deactivateUser = ref.read(deactivateUserUseCaseProvider);
+  late final activateUser = ref.read(activateUserUseCaseProvider);
+  late final getAssignments = ref.read(getAssignmentsUseCaseProvider);
+  late final assignDoctor = ref.read(assignDoctorToPatientUseCaseProvider);
+  late final deleteAssignment = ref.read(deleteAssignmentUseCaseProvider);
 
   @override
   Future<UsersState> build() async {
@@ -23,11 +27,26 @@ class UsersViewModel extends AsyncNotifier<UsersState> {
 
   Future<UsersState> _load({required int pageNumber, required int pageSize}) async {
     final page = await listUsers(pageNumber: pageNumber, pageSize: pageSize);
+    final assignments = await getAssignments(pageSize: 300);
+    final doctorByPatient = <String, AssignmentInfo>{};
+    final countByDoctor = <String, int>{};
+
+    for (final a in assignments) {
+      doctorByPatient[a.patient.id] = AssignmentInfo(
+        assignmentId: a.assignmentId,
+        doctorId: a.doctor.id,
+        doctorName: a.doctor.fullName,
+      );
+      countByDoctor[a.doctor.id] = (countByDoctor[a.doctor.id] ?? 0) + 1;
+    }
+
     return UsersState(
       pageNumber: page.pageNumber,
       pageSize: page.pageSize,
       totalCount: page.totalCount,
       items: page.items,
+      doctorByPatientId: doctorByPatient,
+      patientsCountByDoctorId: countByDoctor,
     );
   }
 
@@ -79,6 +98,38 @@ class UsersViewModel extends AsyncNotifier<UsersState> {
       await ref.read(authViewModelProvider.notifier).logout();
     }
   }
+
+  Future<void> activate(String userId) async {
+    try {
+      await activateUser(userId);
+      await refresh();
+    } on UnauthorizedException {
+      await ref.read(authViewModelProvider.notifier).logout();
+    }
+  }
+
+  Future<void> assignDoctorToPatient({
+    required String patientId,
+    required String doctorId,
+  }) async {
+    try {
+      await assignDoctor(patientId: patientId, doctorId: doctorId);
+      await refresh();
+    } on UnauthorizedException {
+      await ref.read(authViewModelProvider.notifier).logout();
+    }
+  }
+
+  Future<void> unassignDoctorFromPatient({
+    required String assignmentId,
+  }) async {
+    try {
+      await deleteAssignment(assignmentId);
+      await refresh();
+    } on UnauthorizedException {
+      await ref.read(authViewModelProvider.notifier).logout();
+    }
+  }
 }
 
-final usersVmProvider = AsyncNotifierProvider<UsersViewModel, UsersState>(UsersViewModel.new);
+final usersViewModelProvider = AsyncNotifierProvider<UsersViewModel, UsersState>(UsersViewModel.new);
