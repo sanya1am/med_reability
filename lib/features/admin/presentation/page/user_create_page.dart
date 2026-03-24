@@ -34,7 +34,7 @@ class _UserCreatePageState extends ConsumerState<UserCreatePage> {
   }
 
   Future<void> _submit() async {
-    final vm = ref.read(usersVmProvider.notifier);
+    final vm = ref.read(usersViewModelProvider.notifier);
 
     try {
       await vm.addUser(
@@ -81,7 +81,16 @@ class _UserCreatePageState extends ConsumerState<UserCreatePage> {
 
                   DropdownButtonFormField<UserRole>(
                     value: role,
-                    decoration: const InputDecoration(labelText: 'Роль'),
+                    isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                    decoration: const InputDecoration(
+                      hintText: 'Роль',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 13), // ~46px
+                    ),
                     items: const [
                       DropdownMenuItem(value: UserRole.doctor, child: Text('Врач')),
                       DropdownMenuItem(value: UserRole.patient, child: Text('Пациент')),

@@ -32,4 +32,5 @@ abstract class UsersRepository {
   });
 
   Future<void> deactivateUser({required String userId});
+  Future<void> activateUser({required String userId});
 }

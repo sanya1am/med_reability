@@ -52,7 +52,7 @@ class UsersRepositoryImpl implements UsersRepository {
     required String firstName,
     required String patronymic,
     required String lastName,
-    String? phoneNumber,
+    required String phoneNumber,
     required UserRole role,
   }) async {
     try {
@@ -94,6 +94,22 @@ class UsersRepositoryImpl implements UsersRepository {
       if (code == 403) throw Exception('Недостаточно прав.');
       if (code == 404) throw Exception('Пользователь не найден');
       throw Exception('Не удалось деактивировать пользователя');
+    }
+  }
+
+  @override
+  Future<void> activateUser({required String userId}) async {
+    try {
+      await _dio.patch(
+        '/api/users/$userId/activate',
+        options: await _authOptions(),
+      );
+    } on DioException catch (e) {
+      final code = e.response?.statusCode;
+      if (code == 401) throw const UnauthorizedException();
+      if (code == 403) throw Exception('Недостаточно прав.');
+      if (code == 404) throw Exception('Пользователь не найден');
+      throw Exception('Не удалось активировать пользователя');
     }
   }
 

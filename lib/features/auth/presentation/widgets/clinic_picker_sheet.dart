@@ -77,10 +77,10 @@ class _ClinicPickerSheetState extends ConsumerState<ClinicPickerSheet> {
           children: [
             TextField(
               controller: _searchCtrl,
-              style: Theme.of(context).textTheme.bodySmall,
+              style: Theme.of(context).textTheme.headlineSmall,
               decoration: InputDecoration(
                 labelText: 'Поиск поликлиники',
-                labelStyle: Theme.of(context).textTheme.bodySmall,
+                labelStyle: Theme.of(context).textTheme.headlineSmall,
                 prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
                 prefixIcon: Padding(
                   padding: const EdgeInsets.only(left: 12, right: 8),
@@ -109,7 +109,7 @@ class _ClinicPickerSheetState extends ConsumerState<ClinicPickerSheet> {
                   itemBuilder: (_, i) {
                     final c = _items[i];
                     return ListTile(
-                      title: Text(c.name, style: Theme.of(context).textTheme.bodySmall),
+                      title: Text(c.name, style: Theme.of(context).textTheme.headlineSmall),
                       onTap: () => Navigator.of(context).pop<Clinic>(c),
                     );
                   },

@@ -80,7 +80,7 @@ class LoginPage extends ConsumerWidget {
                       ),
                       contentPadding: EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: Text(auth.selectedClinic?.name ?? '', style: TextStyle(fontSize: 20)),
+                    child: Text(auth.selectedClinic?.name ?? '', style: Theme.of(context).textTheme.bodySmall),
                   ),
                 ),
 
