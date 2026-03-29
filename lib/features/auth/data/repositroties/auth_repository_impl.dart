@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
-
 import '../../domain/entities/clinic.dart';
-import '../../domain/entities/role.dart';
 import '../../domain/entities/session.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../../../core/services/token_storage.dart';
 import '../models/login_request.dart';
 import '../models/login_response.dart';
-import '../models/me_response.dart';
+import '../models/user_me_response.dart';
+
 
 class AuthRepositoryImpl implements AuthRepository {
   final Dio _dio;
@@ -16,17 +15,6 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._dio, this._tokenStorage);
 
   List<Clinic>? _cache;
-
-  UserRole _mapRole(String role) {
-    switch (role.toLowerCase()) {
-      case 'admin':
-        return UserRole.admin;
-      case 'doctor':
-        return UserRole.doctor;
-      default:
-        return UserRole.patient;
-    }
-  }
 
   @override
   Future<List<Clinic>> searchClinics(String query) async {
@@ -79,7 +67,7 @@ class AuthRepositoryImpl implements AuthRepository {
         options: Options(headers: {'Authorization': 'Bearer ${login.accessToken}'}),
       );
 
-      final me = MeResponse.fromJson(meRes.data as Map<String, dynamic>);
+      final me = UserMeResponse.fromJson(meRes.data as Map<String, dynamic>);
 
       if (me.clinicId != clinicId) {
         throw Exception('Неверная клиника для учётных данных');
@@ -100,7 +88,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return AuthSession(
         token: login.accessToken,
         clinic: clinic,
-        role: _mapRole(me.role),
+        role: me.mapRole(me.role),
         userId: me.userId,
       );
     } on DioException catch (e) {

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:med_reability/features/admin/presentation/page/admin_profile_page.dart';
 import 'package:med_reability/features/admin/presentation/page/user_create_page.dart';
 import 'package:med_reability/features/admin/presentation/view_model/users_view_model.dart';
 import 'package:med_reability/features/admin/presentation/widgets/users_list.dart';
+import 'package:med_reability/utils/assets/app_assets.dart';
 import '../../../../utils/widgets/app_header.dart';
 import '../../../../utils/widgets/app_bottom_nav.dart';
 
@@ -89,10 +91,10 @@ class _AdminHomePageState extends ConsumerState<AdminHomePage> {
           AppBottomNav(
             index: _index,
             onTap: _onBottomNav,
-            items: const [
-              BottomNavItem(icon: Icons.medical_services_outlined),
-              BottomNavItem(icon: Icons.person_outline),
-              BottomNavItem(icon: Icons.account_circle_outlined),
+            items: [
+              BottomNavItem(icon: SvgPicture.asset(AppAssets.heartIcon)),
+              BottomNavItem(icon: SvgPicture.asset(AppAssets.searchIcon)),
+              BottomNavItem(icon: SvgPicture.asset(AppAssets.profileIcon)),
             ],
           ),
         ],

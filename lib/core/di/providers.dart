@@ -18,6 +18,12 @@ import 'package:med_reability/features/admin/domain/use_case/get_assignments_use
 import 'package:med_reability/features/admin/domain/use_case/list_users_use_case.dart';
 import 'package:med_reability/features/auth/data/repositroties/auth_repository_impl.dart';
 import 'package:med_reability/features/auth/data/repositroties/fake_auth_repository.dart';
+import 'package:med_reability/features/auth/data/repositroties/user_me_repository_impl.dart';
+import 'package:med_reability/features/auth/domain/repositories/user_me_repository.dart';
+import 'package:med_reability/features/auth/domain/use_case/get_user_me_use_case.dart';
+import 'package:med_reability/features/doctor/data/repositories/doctor_patients_repository_impl.dart';
+import 'package:med_reability/features/doctor/domain/repositories/doctor_patients_repository.dart';
+import 'package:med_reability/features/doctor/domain/use_case/get_my_patient_use_case.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/use_case/login_use_case.dart';
 import '../../features/auth/domain/use_case/logout_use_case.dart';
@@ -42,17 +48,24 @@ final appRouterProvider = Provider<GoRouter>((ref) => buildRouter(ref));
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider)); // AuthRepositoryImpl() или FakeAuthRepository()
 });
+final userMeRepositoryProvider = Provider<UserMeRepository>((ref) {
+  return UserMeRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
+});
 final usersRepositoryProvider = Provider<UsersRepository>((ref) {
   return UsersRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
 });
 final assignmentsRepositoryProvider = Provider<DoctorPatientAssignmentsRepository>((ref) {
   return DoctorPatientAssignmentsRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
 });
+final doctorPatientsRepositoryProvider = Provider<DoctorPatientsRepository>((ref) {
+  return DoctorPatientsRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
+});
 
 // use cases
 final loginUseCaseProvider = Provider((ref) => LoginUseCase(ref.read(authRepositoryProvider)));
 final logoutUseCaseProvider = Provider((ref) => LogoutUseCase(ref.read(authRepositoryProvider)));
 final searchClinicsUseCaseProvider = Provider((ref) => SearchClinicsUseCase(ref.read(authRepositoryProvider)));
+final getUserMeUseCaseProvider = Provider((ref) => GetUserMeUseCase(ref.read(userMeRepositoryProvider)));
 final listUsersUseCaseProvider = Provider((ref) => ListUsersUseCase(ref.read(usersRepositoryProvider)));
 final createUserUseCaseProvider = Provider((ref) => CreateUserUseCase(ref.read(usersRepositoryProvider)));
 final deactivateUserUseCaseProvider = Provider((ref) => DeactivateUserUseCase(ref.read(usersRepositoryProvider)));
@@ -60,3 +73,4 @@ final activateUserUseCaseProvider = Provider((ref) => ActivateUserUseCase(ref.re
 final getAssignmentsUseCaseProvider = Provider((ref) => GetAssignmentsUseCase(ref.read(assignmentsRepositoryProvider)));
 final assignDoctorToPatientUseCaseProvider = Provider((ref) => AssignDoctorToPatientUseCase(ref.read(assignmentsRepositoryProvider)));
 final deleteAssignmentUseCaseProvider = Provider((ref) => DeleteAssignmentUseCase(ref.read(assignmentsRepositoryProvider)));
+final getMyPatientsUseCaseProvider = Provider((ref) => GetMyPatientsUseCase(ref.read(doctorPatientsRepositoryProvider)));

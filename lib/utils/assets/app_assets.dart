@@ -2,4 +2,9 @@ class AppAssets {
   static const searchIcon = 'assets/icons/search_rounded.svg';
   static const emailIcon = 'assets/icons/email.svg';
   static const passwordIcon = 'assets/icons/key.svg';
+  static const profileIcon = 'assets/icons/profile.svg';
+  static const heartIcon = 'assets/icons/heart.svg';
+  static const homeIcon = 'assets/icons/home.svg';
+  static const listIcon = 'assets/icons/list.svg';
+  static const notificationsIcon = 'assets/icons/notify.svg';
 }
