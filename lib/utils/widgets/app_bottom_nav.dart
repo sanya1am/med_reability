@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BottomNavItem {
-  final IconData icon;
+  final Widget icon;
   const BottomNavItem({required this.icon});
 }
 
@@ -52,10 +52,21 @@ class AppBottomNav extends StatelessWidget {
                       color: selected ? Colors.black : const Color(0xFFEFEFEF),
                       borderRadius: BorderRadius.circular(26),
                     ),
-                    child: Icon(
-                      items[i].icon,
-                      color: selected ? Colors.white : Colors.black,
-                      size: 24,
+                    child: Center(
+                      child: ColorFiltered(
+                        colorFilter: ColorFilter.mode(
+                          selected ? Colors.white : Colors.black,
+                          BlendMode.srcIn,
+                        ),
+                        child: SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: items[i].icon,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:med_reability/utils/widgets/app_header.dart';
 
 class StubPage extends StatelessWidget {
   final String title;
@@ -15,7 +16,6 @@ class StubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title), actions: actions),
       body: Center(child: body ?? Text('Заглушка: $title')),
     );
   }
