@@ -3,29 +3,58 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:med_reability/utils/widgets/app_text_field.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
+
 import '../../../../utils/assets/app_assets.dart';
 import '../view_model/auth_view_model.dart';
 import '../widgets/clinic_picker_sheet.dart';
 import '../../domain/entities/clinic.dart';
 
-class LoginPage extends ConsumerWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
-  Future<void> _pickClinic(BuildContext context, WidgetRef ref) async {
+  @override
+  ConsumerState<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends ConsumerState<LoginPage> {
+  late final TextEditingController _clinicController;
+
+  @override
+  void initState() {
+    super.initState();
+    _clinicController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _clinicController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickClinic(BuildContext context) async {
     final picked = await showModalBottomSheet<Clinic>(
       context: context,
       isScrollControlled: true,
       builder: (_) => const ClinicPickerSheet(),
     );
+
     if (picked != null) {
       ref.read(authViewModelProvider.notifier).setClinic(picked);
     }
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final auth = ref.watch(authViewModelProvider);
     final vm = ref.read(authViewModelProvider.notifier);
+
+    final clinicName = auth.selectedClinic?.name ?? '';
+    if (_clinicController.text != clinicName) {
+      _clinicController.text = clinicName;
+      _clinicController.selection = TextSelection.collapsed(
+        offset: _clinicController.text.length,
+      );
+    }
 
     return Scaffold(
       body: Padding(
@@ -36,66 +65,78 @@ class LoginPage extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Авторизация', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'Авторизация',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 48),
+
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Введите свои данные', style: Theme.of(context).textTheme.bodyMedium),
+                  child: Text(
+                    'Введите свои данные',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
 
                 AppTextField(
                   hintText: 'Почта',
-                  prefixIcon: SvgPicture.asset(AppAssets.emailIcon, fit: BoxFit.scaleDown),
+                  prefixIcon: SvgPicture.asset(
+                    AppAssets.emailIcon,
+                    fit: BoxFit.scaleDown,
+                  ),
                   onChanged: vm.setEmail,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
+
                 AppTextField(
                   hintText: 'Пароль',
-                  prefixIcon: SvgPicture.asset(AppAssets.passwordIcon, fit: BoxFit.scaleDown),
+                  prefixIcon: SvgPicture.asset(
+                    AppAssets.passwordIcon,
+                    fit: BoxFit.scaleDown,
+                  ),
                   obscureText: true,
                   onChanged: vm.setPassword,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Укажите поликлинику', style: Theme.of(context).textTheme.bodyMedium),
+                  child: Text(
+                    'Укажите поликлинику',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
 
-                InkWell(
-                  onTap: () => _pickClinic(context, ref),
-                  child: InputDecorator(
-                    isEmpty: auth.selectedClinic == null,
-                    decoration: InputDecoration(
-                      prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.only(left: 12, right: 8),
-                        child: SvgPicture.asset(AppAssets.searchIcon, fit: BoxFit.scaleDown),
-                      ),
-                      hintText: 'Поликлиника',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: Text(auth.selectedClinic?.name ?? '', style: Theme.of(context).textTheme.bodySmall),
+                AppTextField(
+                  hintText: 'Поликлиника',
+                  controller: _clinicController,
+                  readOnly: true,
+                  onTap: () => _pickClinic(context),
+                  prefixIcon: SvgPicture.asset(
+                    AppAssets.searchIcon,
+                    fit: BoxFit.scaleDown,
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
 
                 PrimaryButton(
                   text: 'Войти',
                   loading: auth.loading,
                   onPressed: vm.login,
-                  textStyle: Theme.of(context).textTheme.titleMedium,
+                  textStyle: Theme.of(context).textTheme.titleSmall,
+                  height: 38,
                 ),
 
                 if (auth.error != null) ...[
                   const SizedBox(height: 12),
-                  Text(auth.error!, style: const TextStyle(color: Colors.red)),
+                  Text(
+                    auth.error!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
                 ],
               ],
             ),

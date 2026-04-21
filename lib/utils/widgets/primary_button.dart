@@ -18,29 +18,39 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     final effectiveStyle = textStyle ??
-        Theme.of(context).textTheme.titleMedium?.copyWith(
+        theme.textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.w700,
           color: Colors.white,
         );
+
     return SizedBox(
       width: double.infinity,
       height: height,
       child: ElevatedButton(
         onPressed: (onPressed == null || loading) ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black,
+          backgroundColor: theme.colorScheme.primary,
           foregroundColor: Colors.white,
+          disabledBackgroundColor:
+          theme.colorScheme.primary.withOpacity(0.45),
+          disabledForegroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           textStyle: effectiveStyle,
         ),
-        child: loading ? const SizedBox(
+        child: loading
+            ? const SizedBox(
           height: 18,
           width: 18,
-          child: CircularProgressIndicator(strokeWidth: 2),
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
         )
             : Text(text),
       ),

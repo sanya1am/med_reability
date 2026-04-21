@@ -7,4 +7,7 @@ class AppAssets {
   static const homeIcon = 'assets/icons/home.svg';
   static const listIcon = 'assets/icons/list.svg';
   static const notificationsIcon = 'assets/icons/notify.svg';
+  static const uploadMediaIcon = 'assets/icons/upload_media.svg';
+  static const lampIcon = 'assets/icons/lamp.svg';
+  static const doctorsIcon = 'assets/icons/doctors_list.svg';
 }

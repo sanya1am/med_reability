@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:med_reability/core/network/dio_client.dart';
@@ -24,10 +25,17 @@ import 'package:med_reability/features/auth/domain/use_case/get_user_me_use_case
 import 'package:med_reability/features/doctor/data/repositories/doctor_patients_repository_impl.dart';
 import 'package:med_reability/features/doctor/domain/repositories/doctor_patients_repository.dart';
 import 'package:med_reability/features/doctor/domain/use_case/get_my_patient_use_case.dart';
+import 'package:med_reability/features/exercises/data/repositories/exercises_repository_impl.dart';
+import 'package:med_reability/features/exercises/domain/repositories/exercises_repository.dart';
+import 'package:med_reability/features/exercises/domain/use_case/create_exercise_use_case.dart';
+import 'package:med_reability/features/exercises/domain/use_case/get_exercise_by_id_use_case.dart';
+import 'package:med_reability/features/exercises/domain/use_case/get_exercises_use_case.dart';
+import 'package:med_reability/features/exercises/domain/use_case/update_exercise_use_case.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/use_case/login_use_case.dart';
 import '../../features/auth/domain/use_case/logout_use_case.dart';
 import '../../features/auth/domain/use_case/search_clinics_use_case.dart';
+import '../../features/exercises/domain/use_case/delete_exercise_use_case.dart';
 import '../services/token_storage.dart';
 
 final baseUrlProvider = Provider<String>((_) {
@@ -43,6 +51,11 @@ final tokenStorageProvider = Provider<TokenStorage>((_) => TokenStorage());
 
 // app
 final appRouterProvider = Provider<GoRouter>((ref) => buildRouter(ref));
+
+final themeModeProvider = StateProvider<ThemeMode>(
+      // (_) => ThemeMode.light,
+      (_) => ThemeMode.system,
+);
 
 // repo
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -60,6 +73,9 @@ final assignmentsRepositoryProvider = Provider<DoctorPatientAssignmentsRepositor
 final doctorPatientsRepositoryProvider = Provider<DoctorPatientsRepository>((ref) {
   return DoctorPatientsRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
 });
+final exercisesRepositoryProvider = Provider<ExercisesRepository>((ref) {
+  return ExercisesRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
+});
 
 // use cases
 final loginUseCaseProvider = Provider((ref) => LoginUseCase(ref.read(authRepositoryProvider)));
@@ -74,3 +90,8 @@ final getAssignmentsUseCaseProvider = Provider((ref) => GetAssignmentsUseCase(re
 final assignDoctorToPatientUseCaseProvider = Provider((ref) => AssignDoctorToPatientUseCase(ref.read(assignmentsRepositoryProvider)));
 final deleteAssignmentUseCaseProvider = Provider((ref) => DeleteAssignmentUseCase(ref.read(assignmentsRepositoryProvider)));
 final getMyPatientsUseCaseProvider = Provider((ref) => GetMyPatientsUseCase(ref.read(doctorPatientsRepositoryProvider)));
+final getExercisesUseCaseProvider = Provider((ref) => GetExercisesUseCase(ref.read(exercisesRepositoryProvider)));
+final createExerciseUseCaseProvider = Provider((ref) => CreateExerciseUseCase(ref.read(exercisesRepositoryProvider)));
+final deleteExerciseUseCaseProvider = Provider((ref) => DeleteExerciseUseCase(ref.read(exercisesRepositoryProvider)));
+final getExerciseByIdUseCaseProvider = Provider((ref) => GetExerciseByIdUseCase(ref.read(exercisesRepositoryProvider)));
+final updateExerciseUseCaseProvider = Provider((ref) => UpdateExerciseUseCase(ref.read(exercisesRepositoryProvider)));

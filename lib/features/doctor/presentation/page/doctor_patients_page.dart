@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:med_reability/features/doctor/presentation/widgets/patient_card.dart';
+import 'package:med_reability/utils/theme/app_theme.dart';
 import '../../../../utils/widgets/app_text_field.dart';
 import '../view_model/doctor_patients_view_model.dart';
 
@@ -23,85 +25,120 @@ class _DoctorPatientsPageState extends ConsumerState<DoctorPatientsPage> {
   @override
   Widget build(BuildContext context) {
     final data = ref.watch(doctorPatientsViewModelProvider);
+    final colors = context.appColors;
 
     return data.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Ошибка: $e')),
+      error: (e, _) => Center(
+        child: Text(
+          'Ошибка: $e',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: colors.textPrimary,
+          ),
+        ),
+      ),
       data: (s) {
+        final allPatients = s.patients;
+
+        if (allPatients.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: () =>
+                ref.read(doctorPatientsViewModelProvider.notifier).refresh(),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 40,
+                              color: colors.textPrimary,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'У вас пока нет пациентов',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: colors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        }
+
         final q = _search.text.trim().toLowerCase();
-        final list = q.isEmpty
-            ? s.patients
-            : s.patients.where((p) {
+        final filtered = q.isEmpty
+            ? allPatients
+            : allPatients.where((p) {
           final hay = ('${p.fullName} ${p.email}').toLowerCase();
           return hay.contains(q);
         }).toList();
 
         return RefreshIndicator(
-          onRefresh: () => ref.read(doctorPatientsViewModelProvider.notifier).refresh(),
+          onRefresh: () =>
+              ref.read(doctorPatientsViewModelProvider.notifier).refresh(),
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            padding: const EdgeInsets.fromLTRB(28, 16, 28, 120),
             children: [
               AppTextField(
                 hintText: 'Найти пациента',
                 controller: _search,
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: colors.textPrimary,
+                ),
                 onChanged: (_) => setState(() {}),
               ),
-              const SizedBox(height: 14),
-              ...list.map((p) => _PatientCard(
-                name: p.fullName,
-                subtitle: p.phoneNumber,
-              )),
+              const SizedBox(height: 24),
+
+              if (filtered.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 40,
+                          color: colors.textSecondary,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'По вашему запросу ничего не найдено',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: colors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                ...filtered.map(
+                      (p) => PatientCard(
+                    name: p.fullName,
+                    subtitle: p.phoneNumber,
+                  ),
+                ),
             ],
           ),
         );
       },
-    );
-  }
-}
-
-class _PatientCard extends StatelessWidget {
-  final String name;
-  final String subtitle;
-
-  const _PatientCard({required this.name, required this.subtitle});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x11000000),
-            blurRadius: 12,
-            offset: Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 20,
-            backgroundColor: Color(0xFFEFEFEF),
-            child: Icon(Icons.person, color: Colors.black),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name, style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 2),
-                Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

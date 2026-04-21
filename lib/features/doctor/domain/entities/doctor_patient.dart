@@ -19,8 +19,11 @@ class DoctorPatient {
     required this.isActive,
   });
 
-  String get fullName {
+  String get fullFullName {
     final p = patronymic.trim();
     return p.isEmpty ? '$lastName $firstName' : '$lastName $firstName $p';
+  }
+  String get fullName {
+    return '$lastName $firstName';
   }
 }
