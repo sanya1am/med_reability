@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:med_reability/utils/theme/app_theme.dart';
 import '../../../../utils/widgets/app_text_field.dart';
 import '../../../../utils/widgets/primary_button.dart';
 import '../../../auth/presentation/view_model/auth_view_model.dart';
@@ -31,6 +32,8 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authViewModelProvider);
+    final colors = context.appColors;
+
     return SafeArea(
       child: Center(
         child: SingleChildScrollView(
@@ -40,8 +43,12 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Клиника: ${auth.session?.clinic.name ?? '-'}',
-                    style: Theme.of(context).textTheme.bodyMedium),
+                Text(
+                  'Клиника: ${auth.session?.clinic.name ?? '-'}',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: colors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 16),
 
                 AppTextField(hintText: 'Фамилия', controller: lastCtrl),
@@ -50,9 +57,17 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage> {
                 const SizedBox(height: 12),
                 AppTextField(hintText: 'Отчество', controller: patronymicCtrl),
                 const SizedBox(height: 12),
-                AppTextField(hintText: 'Email', controller: emailCtrl, keyboardType: TextInputType.emailAddress),
+                AppTextField(
+                  hintText: 'Email',
+                  controller: emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                ),
                 const SizedBox(height: 12),
-                AppTextField(hintText: 'Телефон', controller: phoneCtrl, keyboardType: TextInputType.phone),
+                AppTextField(
+                  hintText: 'Телефон',
+                  controller: phoneCtrl,
+                  keyboardType: TextInputType.phone,
+                ),
 
                 const SizedBox(height: 28),
                 PrimaryButton(
@@ -64,7 +79,7 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage> {
             ),
           ),
         ),
-      )
+      ),
     );
   }
 }

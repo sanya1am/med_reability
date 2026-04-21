@@ -76,7 +76,7 @@ class DoctorPatientAssignmentsRepositoryImpl implements DoctorPatientAssignments
       if (code == 401) throw const UnauthorizedException();
       if (code == 403) throw Exception('Недостаточно прав');
       if (code == 404) throw Exception('Доктор или пациент не найден');
-      throw Exception('Не удалось назначить врача');
+      throw Exception('Не удалось назначить инструктора');
     }
   }
 

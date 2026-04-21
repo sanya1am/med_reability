@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:med_reability/utils/theme/app_theme.dart';
+import 'app_circle_icon_button.dart';
 
 class AppHeader extends StatelessWidget {
   final String title;
@@ -15,12 +17,15 @@ class AppHeader extends StatelessWidget {
     this.onAction,
     this.actionIcon,
     this.actionIconWidget,
-    this.actionBoxSize = 46,
-    this.iconSize = 22,
+    this.actionBoxSize = 40,
+    this.iconSize = 18,
   });
 
   @override
   Widget build(BuildContext context) {
+    final hasAction =
+        onAction != null && (actionIcon != null || actionIconWidget != null);
+
     return SafeArea(
       bottom: false,
       child: Padding(
@@ -33,47 +38,39 @@ class AppHeader extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
-            // const Spacer(),
-
-            SizedBox(
-              width: actionBoxSize,
-              height: actionBoxSize,
-              child: (onAction != null && (actionIcon != null || actionIconWidget != null))
-                  ? GestureDetector(
+            if (hasAction)
+              AppCircleIconButton(
+                size: actionBoxSize,
                 onTap: onAction,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEFEFEF),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: _buildIcon(),
-                  ),
-                ),
-              )
-                  : const SizedBox.shrink(),
-            ),
+                icon: _buildIcon(context),
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildIcon() {
+  Widget _buildIcon(BuildContext context) {
+    final colors = context.appColors;
+
     if (actionIconWidget != null) {
       return ColorFiltered(
-        colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+        colorFilter: ColorFilter.mode(
+          colors.textPrimary,
+          BlendMode.srcIn,
+        ),
         child: SizedBox(
           width: iconSize,
           height: iconSize,
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: actionIconWidget!,
-          ),
+          child: Center(child: actionIconWidget!),
         ),
       );
     }
 
-    return Icon(actionIcon, size: iconSize, color: Colors.black);
+    return Icon(
+      actionIcon,
+      size: iconSize,
+      color: colors.textPrimary,
+    );
   }
 }

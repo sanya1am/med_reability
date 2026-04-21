@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:med_reability/features/admin/domain/entities/clinic_user.dart';
 import 'package:med_reability/features/admin/presentation/state/users_state.dart';
 import 'package:med_reability/features/admin/presentation/widgets/user_actions_sheet.dart';
 import 'package:med_reability/features/auth/domain/entities/role.dart';
+import 'package:med_reability/utils/theme/app_theme.dart';
 
 enum UsersTab { doctors, patients }
 
@@ -14,6 +14,7 @@ class UsersList extends ConsumerWidget {
   final UsersTab tab;
 
   const UsersList({
+    super.key,
     required this.users,
     required this.state,
     required this.tab,
@@ -21,12 +22,23 @@ class UsersList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (users.isEmpty) return const Center(child: Text('Пусто'));
+    final colors = context.appColors;
+
+    if (users.isEmpty) {
+      return Center(
+        child: Text(
+          'Пусто',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: colors.textPrimary,
+          ),
+        ),
+      );
+    }
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
+      padding: const EdgeInsets.fromLTRB(28, 16, 28, 120),
       itemCount: users.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (_, i) {
         final u = users[i] as ClinicUser;
 
@@ -35,16 +47,12 @@ class UsersList extends ConsumerWidget {
 
         String subtitle = u.email;
         if (tab == UsersTab.patients) {
-          subtitle = assignment == null ? 'Врач: не назначен' : 'Врач: ${assignment.doctorName}';
+          subtitle = assignment == null
+              ? 'Инструктор: не назначен'
+              : 'Инструктор: ${assignment.doctorName}';
         } else if (tab == UsersTab.doctors && patientsCount > 0) {
           subtitle = 'Пациентов: $patientsCount';
         }
-
-        final hasAssignments = tab == UsersTab.patients
-            ? assignment != null
-            : (tab == UsersTab.doctors ? patientsCount > 0 : false);
-
-        final canDeactivate = u.isActive && !hasAssignments;
 
         return GestureDetector(
           onTap: () => showUserActionsSheet(
@@ -55,10 +63,19 @@ class UsersList extends ConsumerWidget {
             doctorPatientsCount: u.role == UserRole.doctor ? patientsCount : 0,
           ),
           child: Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFFF6F6F6),
-              borderRadius: BorderRadius.circular(18),
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black.withOpacity(0.18)
+                      : const Color(0x22000000),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -66,26 +83,36 @@ class UsersList extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(u.fullName, style: Theme.of(context).textTheme.titleMedium),
+                      Text(
+                        u.fullName,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                       const SizedBox(height: 4),
-                      Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colors.textSecondary,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(width: 10),
-
                 Text(
                   u.isActive ? 'Активен' : 'Неактивен',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: u.isActive ? Colors.black : const Color(0xFF9A9A9A),
+                    color: u.isActive
+                        ? colors.textPrimary
+                        : colors.textSecondary,
                   ),
                 ),
-
                 const SizedBox(width: 10),
-
-                const SizedBox(width: 6),
-                const Icon(Icons.more_horiz, size: 22),
+                Icon(
+                  Icons.more_horiz,
+                  size: 22,
+                  color: colors.textPrimary,
+                ),
               ],
             ),
           ),
