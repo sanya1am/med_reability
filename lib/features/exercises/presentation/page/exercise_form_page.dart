@@ -11,7 +11,7 @@ import '../../domain/entities/exercise_media_file.dart';
 import '../view_model/exercise_form_view_model.dart';
 import '../widgets/exercise_create_media_upload_box.dart';
 import '../widgets/exercise_create_step_input.dart';
-import '../widgets/exercise_create_top_actions.dart';
+import '../../../../utils/widgets/app_top_actions_bar.dart';
 import '../widgets/exercise_type_dropdown.dart';
 
 class ExerciseFormPage extends ConsumerStatefulWidget {
@@ -180,7 +180,7 @@ class _ExerciseFormPageState extends ConsumerState<ExerciseFormPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ExerciseCreateTopActions(
+                  AppTopActionsBar(
                     onBack: () => Navigator.pop(context),
                     onNotify: () {},
                   ),

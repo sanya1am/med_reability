@@ -39,6 +39,10 @@ class UserMeViewModel extends AsyncNotifier<UserMe?> {
 
     state = next;
   }
+
+  void setUser(UserMe user) {
+    state = AsyncData(user);
+  }
 }
 
 final userMeViewModelProvider =

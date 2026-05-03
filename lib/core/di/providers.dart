@@ -31,11 +31,15 @@ import 'package:med_reability/features/exercises/domain/use_case/create_exercise
 import 'package:med_reability/features/exercises/domain/use_case/get_exercise_by_id_use_case.dart';
 import 'package:med_reability/features/exercises/domain/use_case/get_exercises_use_case.dart';
 import 'package:med_reability/features/exercises/domain/use_case/update_exercise_use_case.dart';
+import 'package:med_reability/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:med_reability/features/profile/domain/repositories/profile_repository.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/use_case/login_use_case.dart';
 import '../../features/auth/domain/use_case/logout_use_case.dart';
 import '../../features/auth/domain/use_case/search_clinics_use_case.dart';
 import '../../features/exercises/domain/use_case/delete_exercise_use_case.dart';
+import '../../features/profile/domain/use_case/change_my_password_use_case.dart';
+import '../../features/profile/domain/use_case/update_my_profile_use_case.dart';
 import '../services/token_storage.dart';
 
 final baseUrlProvider = Provider<String>((_) {
@@ -76,6 +80,9 @@ final doctorPatientsRepositoryProvider = Provider<DoctorPatientsRepository>((ref
 final exercisesRepositoryProvider = Provider<ExercisesRepository>((ref) {
   return ExercisesRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
 });
+final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
+  return ProfileRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
+});
 
 // use cases
 final loginUseCaseProvider = Provider((ref) => LoginUseCase(ref.read(authRepositoryProvider)));
@@ -95,3 +102,5 @@ final createExerciseUseCaseProvider = Provider((ref) => CreateExerciseUseCase(re
 final deleteExerciseUseCaseProvider = Provider((ref) => DeleteExerciseUseCase(ref.read(exercisesRepositoryProvider)));
 final getExerciseByIdUseCaseProvider = Provider((ref) => GetExerciseByIdUseCase(ref.read(exercisesRepositoryProvider)));
 final updateExerciseUseCaseProvider = Provider((ref) => UpdateExerciseUseCase(ref.read(exercisesRepositoryProvider)));
+final updateMyProfileUseCaseProvider = Provider((ref) => UpdateMyProfileUseCase(ref.read(profileRepositoryProvider)));
+final changeMyPasswordUseCaseProvider = Provider((ref) => ChangeMyPasswordUseCase(ref.read(profileRepositoryProvider)));

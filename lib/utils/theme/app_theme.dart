@@ -10,6 +10,12 @@ const _lightTextSecondary = Color(0xFF525252);
 const _lightHint = Color(0xFF9A9A9A);
 const _lightBorder = Color(0x26000000);
 
+const _lightDialogBackground = Colors.white;
+const _lightDialogShadow = Color(0x16000000);
+const _lightSecondaryButtonBackground = Colors.white;
+const _lightSecondaryButtonForeground = Color(0xFF2A56EF);
+const _lightSecondaryButtonBorder = Color(0xFF2A56EF);
+
 const _darkBackground = Color(0xFF262626);
 const _darkSurface = Color(0xFF525252);
 const _darkSurfaceAlt = Color(0xFF525252);
@@ -17,6 +23,12 @@ const _darkText = Colors.white;
 const _darkTextSecondary = Colors.white70;
 const _darkHint = Colors.white60;
 const _darkBorder = Color(0x66FFFFFF);
+
+const _darkDialogBackground = Color(0xFF373737);
+const _darkDialogShadow = Color(0x33000000);
+const _darkSecondaryButtonBackground = Color(0xFF8A8A8A);
+const _darkSecondaryButtonForeground = Colors.white;
+const _darkSecondaryButtonBorder = Color(0xFF8A8A8A);
 
 @immutable
 class AppColors extends ThemeExtension<AppColors> {
@@ -31,6 +43,12 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color navBackground;
   final Color navInactiveIcon;
 
+  final Color dialogBackground;
+  final Color dialogShadow;
+  final Color secondaryButtonBackground;
+  final Color secondaryButtonForeground;
+  final Color secondaryButtonBorder;
+
   const AppColors({
     required this.background,
     required this.surface,
@@ -42,6 +60,11 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.iconButtonBackground,
     required this.navBackground,
     required this.navInactiveIcon,
+    required this.dialogBackground,
+    required this.dialogShadow,
+    required this.secondaryButtonBackground,
+    required this.secondaryButtonForeground,
+    required this.secondaryButtonBorder,
   });
 
   @override
@@ -56,6 +79,11 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? iconButtonBackground,
     Color? navBackground,
     Color? navInactiveIcon,
+    Color? dialogBackground,
+    Color? dialogShadow,
+    Color? secondaryButtonBackground,
+    Color? secondaryButtonForeground,
+    Color? secondaryButtonBorder,
   }) {
     return AppColors(
       background: background ?? this.background,
@@ -68,6 +96,14 @@ class AppColors extends ThemeExtension<AppColors> {
       iconButtonBackground: iconButtonBackground ?? this.iconButtonBackground,
       navBackground: navBackground ?? this.navBackground,
       navInactiveIcon: navInactiveIcon ?? this.navInactiveIcon,
+      dialogBackground: dialogBackground ?? this.dialogBackground,
+      dialogShadow: dialogShadow ?? this.dialogShadow,
+      secondaryButtonBackground:
+      secondaryButtonBackground ?? this.secondaryButtonBackground,
+      secondaryButtonForeground:
+      secondaryButtonForeground ?? this.secondaryButtonForeground,
+      secondaryButtonBorder:
+      secondaryButtonBorder ?? this.secondaryButtonBorder,
     );
   }
 
@@ -86,6 +122,23 @@ class AppColors extends ThemeExtension<AppColors> {
       iconButtonBackground: Color.lerp(iconButtonBackground, other.iconButtonBackground, t)!,
       navBackground: Color.lerp(navBackground, other.navBackground, t)!,
       navInactiveIcon: Color.lerp(navInactiveIcon, other.navInactiveIcon, t)!,
+      dialogBackground: Color.lerp(dialogBackground, other.dialogBackground, t)!,
+      dialogShadow: Color.lerp(dialogShadow, other.dialogShadow, t)!,
+      secondaryButtonBackground: Color.lerp(
+        secondaryButtonBackground,
+        other.secondaryButtonBackground,
+        t,
+      )!,
+      secondaryButtonForeground: Color.lerp(
+        secondaryButtonForeground,
+        other.secondaryButtonForeground,
+        t,
+      )!,
+      secondaryButtonBorder: Color.lerp(
+        secondaryButtonBorder,
+        other.secondaryButtonBorder,
+        t,
+      )!,
     );
   }
 }
@@ -101,6 +154,11 @@ const lightAppColors = AppColors(
   iconButtonBackground: _lightSurface,
   navBackground: _lightSurface,
   navInactiveIcon: _lightText,
+  dialogBackground: _lightDialogBackground,
+  dialogShadow: _lightDialogShadow,
+  secondaryButtonBackground: _lightSecondaryButtonBackground,
+  secondaryButtonForeground: _lightSecondaryButtonForeground,
+  secondaryButtonBorder: _lightSecondaryButtonBorder,
 );
 
 const darkAppColors = AppColors(
@@ -114,6 +172,11 @@ const darkAppColors = AppColors(
   iconButtonBackground: _darkSurface,
   navBackground: _darkSurface,
   navInactiveIcon: _darkText,
+  dialogBackground: _darkDialogBackground,
+  dialogShadow: _darkDialogShadow,
+  secondaryButtonBackground: _darkSecondaryButtonBackground,
+  secondaryButtonForeground: _darkSecondaryButtonForeground,
+  secondaryButtonBorder: _darkSecondaryButtonBorder,
 );
 
 TextTheme _buildTextTheme(Color textColor) {

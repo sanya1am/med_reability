@@ -7,7 +7,7 @@ import 'package:med_reability/utils/widgets/primary_button.dart';
 
 import '../../domain/entities/exercise.dart';
 import '../view_model/exercises_view_model.dart';
-import '../widgets/exercise_create_top_actions.dart';
+import '../../../../utils/widgets/app_top_actions_bar.dart';
 import 'exercise_form_page.dart';
 
 class ExerciseDetailsPage extends ConsumerStatefulWidget {
@@ -107,7 +107,7 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(28, 12, 28, 24),
             children: [
-              ExerciseCreateTopActions(
+              AppTopActionsBar(
                 onBack: () => Navigator.pop(context),
                 onNotify: () {},
               ),
