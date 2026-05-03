@@ -12,12 +12,15 @@ class UsersRepositoryImpl implements UsersRepository {
 
   UsersRepositoryImpl(this._dio, this._tokenStorage);
 
-  Future<Options> _authOptions() async {
+  Future<Options> _authOptions({String? contentType}) async {
     final token = await _tokenStorage.readToken();
     if (token == null || token.isEmpty) {
       throw Exception('Нет токена. Выполните вход заново.');
     }
-    return Options(headers: {'Authorization': 'Bearer $token'});
+    return Options(
+      headers: {'Authorization': 'Bearer $token'},
+      contentType: contentType,
+    );
   }
 
   @override
@@ -56,25 +59,47 @@ class UsersRepositoryImpl implements UsersRepository {
     required UserRole role,
   }) async {
     try {
+      final formData = FormData.fromMap({
+        'email': email,
+        'password': password,
+        'firstName': firstName,
+        'patronymic': patronymic,
+        'lastName': lastName,
+        'phoneNumber': phoneNumber,
+        'role': role.name,
+      });
       final res = await _dio.post(
         '/api/users',
-        data: createUserBody(
-          email: email,
-          password: password,
-          firstName: firstName,
-          patronymic: patronymic,
-          lastName: lastName,
-          phoneNumber: phoneNumber,
-          role: role,
+        data: formData,
+        options: await _authOptions(
+          contentType: 'multipart/form-data',
         ),
-        options: await _authOptions(),
       );
+      // final res = await _dio.post(
+      //   '/api/users',
+      //   data: createUserBody(
+      //     email: email,
+      //     password: password,
+      //     firstName: firstName,
+      //     patronymic: patronymic,
+      //     lastName: lastName,
+      //     phoneNumber: phoneNumber,
+      //     role: role,
+      //   ),
+      //   options: await _authOptions(),
+      // );
 
       final dto = ClinicUserDto.fromJson(res.data as Map<String, dynamic>);
       return dto.toEntity();
     } on DioException catch (e) {
       final code = e.response?.statusCode;
-      if (code == 400) throw Exception(_problemDetail(e.response?.data));
+      final data = e.response?.data;
+
+      print('createUser status: $code');
+      print('createUser data: $data');
+      print('createUser message: ${e.message}');
+
+      if (code == 400) throw Exception(_problemDetail(data));
       if (code == 401) throw const UnauthorizedException();
       if (code == 403) throw Exception('Недостаточно прав.');
       throw Exception('Не удалось создать пользователя');

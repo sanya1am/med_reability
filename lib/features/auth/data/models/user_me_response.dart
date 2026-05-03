@@ -1,3 +1,4 @@
+import 'package:med_reability/core/services/media_url_helper.dart';
 import 'package:med_reability/features/auth/domain/entities/role.dart';
 import 'package:med_reability/features/auth/domain/entities/user_me.dart';
 
@@ -10,6 +11,7 @@ class UserMeResponse {
   final String lastName;
   final String patronymic;
   final String phoneNumber;
+  final String? imageUrl;
 
   const UserMeResponse({
     required this.userId,
@@ -20,9 +22,12 @@ class UserMeResponse {
     required this.lastName,
     required this.patronymic,
     required this.phoneNumber,
+    required this.imageUrl,
   });
 
   factory UserMeResponse.fromJson(Map<String, dynamic> json) {
+    final rawImageUrl = (json['imageUrl'] as String?)?.trim();
+
     return UserMeResponse(
       userId: json['userId'] as String,
       clinicId: json['clinicId'] as String,
@@ -32,6 +37,9 @@ class UserMeResponse {
       lastName: (json['lastName'] ?? '') as String,
       patronymic: (json['patronymic'] as String?) ?? '',
       phoneNumber: (json['phoneNumber'] as String?) ?? '',
+      imageUrl: (rawImageUrl == null || rawImageUrl.isEmpty)
+          ? null
+          : normalizeMediaUrl(rawImageUrl),
     );
   }
 
@@ -55,5 +63,6 @@ class UserMeResponse {
     lastName: lastName,
     patronymic: patronymic,
     phoneNumber: phoneNumber,
+    imageUrl: imageUrl,
   );
 }

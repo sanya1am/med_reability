@@ -21,7 +21,7 @@ class _UserCreatePageState extends ConsumerState<UserCreatePage> {
   final patronymicCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
 
-  UserRole role = UserRole.doctor;
+  UserRole role = UserRole.patient;
 
   @override
   void dispose() {
@@ -53,6 +53,7 @@ class _UserCreatePageState extends ConsumerState<UserCreatePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('$e')),
       );
+      print(e);
     }
   }
 
@@ -60,7 +61,8 @@ class _UserCreatePageState extends ConsumerState<UserCreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Создать пользователя'),
+        title: const Text('Создать пользователя', ),
+        titleTextStyle: Theme.of(context).textTheme.headlineMedium,
       ),
       body: SafeArea(
         child: Center(

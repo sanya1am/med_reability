@@ -4,11 +4,11 @@ import 'package:med_reability/utils/assets/app_assets.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/app_circle_icon_button.dart';
 
-class ExerciseCreateTopActions extends StatelessWidget {
+class AppTopActionsBar extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onNotify;
 
-  const ExerciseCreateTopActions({
+  const AppTopActionsBar({
     super.key,
     required this.onBack,
     required this.onNotify,
