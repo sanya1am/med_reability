@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:med_reability/features/exercises/presentation/state/exercise_form_state.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
+import 'package:med_reability/utils/widgets/app_secondary_button.dart';
 
 import '../../../../utils/widgets/app_text_field.dart';
 import '../../../../utils/widgets/primary_button.dart';
@@ -274,7 +275,7 @@ class _ExerciseFormPageState extends ConsumerState<ExerciseFormPage> {
                   const SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,
-                    child: PrimaryButton(
+                    child: SecondaryButton(
                       text: 'Добавить шаг',
                       onPressed: formState.isSubmitting ? null : _addStep,
                       height: 38,

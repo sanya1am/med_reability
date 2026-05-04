@@ -17,9 +17,9 @@ import 'package:med_reability/features/admin/domain/use_case/deactivate_user_use
 import 'package:med_reability/features/admin/domain/use_case/delete_assignment_use_case.dart';
 import 'package:med_reability/features/admin/domain/use_case/get_assignments_use_case.dart';
 import 'package:med_reability/features/admin/domain/use_case/list_users_use_case.dart';
-import 'package:med_reability/features/auth/data/repositroties/auth_repository_impl.dart';
-import 'package:med_reability/features/auth/data/repositroties/fake_auth_repository.dart';
-import 'package:med_reability/features/auth/data/repositroties/user_me_repository_impl.dart';
+import 'package:med_reability/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:med_reability/features/auth/data/repositories/fake_auth_repository.dart';
+import 'package:med_reability/features/auth/data/repositories/user_me_repository_impl.dart';
 import 'package:med_reability/features/auth/domain/repositories/user_me_repository.dart';
 import 'package:med_reability/features/auth/domain/use_case/get_user_me_use_case.dart';
 import 'package:med_reability/features/doctor/data/repositories/doctor_patients_repository_impl.dart';
@@ -38,6 +38,7 @@ import '../../features/auth/domain/use_case/login_use_case.dart';
 import '../../features/auth/domain/use_case/logout_use_case.dart';
 import '../../features/auth/domain/use_case/search_clinics_use_case.dart';
 import '../../features/exercises/domain/use_case/delete_exercise_use_case.dart';
+import '../../features/exercises/domain/use_case/get_exercise_filter_options_use_case.dart';
 import '../../features/profile/domain/use_case/change_my_password_use_case.dart';
 import '../../features/profile/domain/use_case/update_my_profile_use_case.dart';
 import '../services/token_storage.dart';
@@ -104,3 +105,4 @@ final getExerciseByIdUseCaseProvider = Provider((ref) => GetExerciseByIdUseCase(
 final updateExerciseUseCaseProvider = Provider((ref) => UpdateExerciseUseCase(ref.read(exercisesRepositoryProvider)));
 final updateMyProfileUseCaseProvider = Provider((ref) => UpdateMyProfileUseCase(ref.read(profileRepositoryProvider)));
 final changeMyPasswordUseCaseProvider = Provider((ref) => ChangeMyPasswordUseCase(ref.read(profileRepositoryProvider)));
+final getExerciseFilterOptionsUseCaseProvider = Provider((ref) => GetExerciseFilterOptionsUseCase(ref.read(exercisesRepositoryProvider)));

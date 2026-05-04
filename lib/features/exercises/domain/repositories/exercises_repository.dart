@@ -1,4 +1,5 @@
 import '../entities/exercise.dart';
+import '../entities/exercise_filter_options.dart';
 import '../entities/exercise_media_file.dart';
 import '../entities/exercise_type.dart';
 
@@ -32,4 +33,6 @@ abstract class ExercisesRepository {
   });
 
   Future<void> deleteExercise(String id);
+
+  Future<ExerciseFilterOptions> getFilterOptions();
 }

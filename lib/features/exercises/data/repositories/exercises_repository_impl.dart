@@ -6,6 +6,8 @@ import '../../domain/entities/exercise_media_file.dart';
 import '../../domain/entities/exercise_type.dart';
 import '../../domain/repositories/exercises_repository.dart';
 import '../models/exercise_dto.dart';
+import '../models/exercise_filter_options_dto.dart';
+import '../../domain/entities/exercise_filter_options.dart';
 
 
 class ExercisesRepositoryImpl implements ExercisesRepository {
@@ -205,6 +207,25 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
       if (code == 403) throw Exception('Недостаточно прав');
       if (code == 404) throw Exception('Упражнение не найдено');
       throw Exception('Не удалось удалить упражнение');
+    }
+  }
+
+  @override
+  Future<ExerciseFilterOptions> getFilterOptions() async {
+    try {
+      final res = await _dio.get(
+        '/api/exercises/filter-options',
+        options: await _authOptions(),
+      );
+
+      return ExerciseFilterOptionsDto
+          .fromJson(res.data as Map<String, dynamic>)
+          .toEntity();
+    } on DioException catch (e) {
+      final code = e.response?.statusCode;
+      if (code == 401) throw const UnauthorizedException();
+      if (code == 403) throw Exception('Недостаточно прав');
+      throw Exception('Не удалось загрузить фильтры упражнений');
     }
   }
 }
