@@ -10,6 +10,9 @@ class ExerciseFormState {
   final List<ExerciseMediaFile> pickedMediaFiles;
   final bool isSubmitting;
   final String? errorMessage;
+  final List<String> exerciseTypes;
+  final List<String> bodyParts;
+  final List<String> inventory;
 
   const ExerciseFormState({
     required this.initialExercise,
@@ -19,6 +22,9 @@ class ExerciseFormState {
     required this.pickedMediaFiles,
     required this.isSubmitting,
     required this.errorMessage,
+    this.exerciseTypes = const [],
+    this.bodyParts = const [],
+    this.inventory = const [],
   });
 
   factory ExerciseFormState.fromExercise(Exercise? exercise) {
@@ -30,6 +36,9 @@ class ExerciseFormState {
       pickedMediaFiles: const [],
       isSubmitting: false,
       errorMessage: null,
+      exerciseTypes: exercise?.exerciseTypes ?? const [],
+      bodyParts: exercise?.bodyParts ?? const [],
+      inventory: exercise?.inventory ?? const [],
     );
   }
 
@@ -47,6 +56,9 @@ class ExerciseFormState {
     bool? isSubmitting,
     String? errorMessage,
     bool clearErrorMessage = false,
+    List<String>? exerciseTypes,
+    List<String>? bodyParts,
+    List<String>? inventory,
   }) {
     return ExerciseFormState(
       initialExercise: initialExercise ?? this.initialExercise,
@@ -56,6 +68,9 @@ class ExerciseFormState {
       pickedMediaFiles: pickedMediaFiles ?? this.pickedMediaFiles,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
+      exerciseTypes: exerciseTypes ?? this.exerciseTypes,
+      bodyParts: bodyParts ?? this.bodyParts,
+      inventory: inventory ?? this.inventory,
     );
   }
 }

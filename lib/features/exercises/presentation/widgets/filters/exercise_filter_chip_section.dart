@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:med_reability/features/exercises/presentation/widgets/filters/exercise_filter_chip_button.dart';
+import 'exercise_filter_chip_button.dart';
+
 
 class ExerciseFilterChipSection extends StatelessWidget {
   final String title;
@@ -7,6 +8,9 @@ class ExerciseFilterChipSection extends StatelessWidget {
   final List<String> selectedValues;
   final ValueChanged<String> onToggle;
   final String Function(String value)? labelBuilder;
+  final TextStyle? textStyle;
+  final TextStyle? chipTextStyle;
+  final Color? chipUnselectedBackgroundColor;
 
   const ExerciseFilterChipSection({
     super.key,
@@ -15,12 +19,16 @@ class ExerciseFilterChipSection extends StatelessWidget {
     required this.selectedValues,
     required this.onToggle,
     this.labelBuilder,
+    this.textStyle,
+    this.chipTextStyle,
+    this.chipUnselectedBackgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return _FilterBlock(
       title: title,
+      textStyle: textStyle,
       child: Wrap(
         spacing: 8,
         runSpacing: 8,
@@ -31,6 +39,8 @@ class ExerciseFilterChipSection extends StatelessWidget {
             text: labelBuilder?.call(value) ?? value,
             selected: selected,
             onTap: () => onToggle(value),
+            textStyle: chipTextStyle,
+            unselectedBackgroundColor: chipUnselectedBackgroundColor,
           );
         }).toList(),
       ),
@@ -41,20 +51,24 @@ class ExerciseFilterChipSection extends StatelessWidget {
 class _FilterBlock extends StatelessWidget {
   final String title;
   final Widget child;
+  final TextStyle? textStyle;
 
   const _FilterBlock({
     required this.title,
     required this.child,
+    this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveStyle = textStyle ?? Theme.of(context).textTheme.titleSmall;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.titleSmall,
+          style: effectiveStyle,
         ),
         const SizedBox(height: 8),
         child,

@@ -94,8 +94,11 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
     required String description,
     required List<String> steps,
     required ExerciseType type,
-    required bool isGlobal,
+    bool isGlobal = true,
     List<ExerciseMediaFile> mediaFiles = const [],
+    List<String> exerciseTypes = const [],
+    List<String> bodyParts = const [],
+    List<String> inventory = const [],
   }) async {
     try {
       final fd = FormData();
@@ -109,6 +112,10 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
       for (final s in steps.where((x) => x.trim().isNotEmpty)) {
         fd.fields.add(MapEntry('Steps', s));
       }
+
+      _addStringListFields(fd, 'ExerciseTypes', exerciseTypes);
+      _addStringListFields(fd, 'BodyParts', bodyParts);
+      _addStringListFields(fd, 'Inventory', inventory);
 
       for (final file in mediaFiles) {
         fd.files.add(
@@ -148,6 +155,9 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
     required List<String> steps,
     required ExerciseType type,
     List<ExerciseMediaFile> mediaFiles = const [],
+    List<String> exerciseTypes = const [],
+    List<String> bodyParts = const [],
+    List<String> inventory = const [],
   }) async {
     try {
       final fd = FormData();
@@ -160,6 +170,10 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
       for (final s in steps.where((x) => x.trim().isNotEmpty)) {
         fd.fields.add(MapEntry('Steps', s));
       }
+
+      _addStringListFields(fd, 'ExerciseTypes', exerciseTypes);
+      _addStringListFields(fd, 'BodyParts', bodyParts);
+      _addStringListFields(fd, 'Inventory', inventory);
 
       for (final file in mediaFiles) {
         fd.files.add(
@@ -226,6 +240,16 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
       if (code == 401) throw const UnauthorizedException();
       if (code == 403) throw Exception('Недостаточно прав');
       throw Exception('Не удалось загрузить фильтры упражнений');
+    }
+  }
+
+  void _addStringListFields(
+      FormData fd,
+      String fieldName,
+      List<String> values,
+      ) {
+    for (final value in values.map((x) => x.trim()).where((x) => x.isNotEmpty)) {
+      fd.fields.add(MapEntry(fieldName, value));
     }
   }
 }

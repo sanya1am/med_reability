@@ -19,8 +19,11 @@ abstract class ExercisesRepository {
     required String description,
     required List<String> steps,
     required ExerciseType type,
-    required bool isGlobal,
+    bool isGlobal = false,
     List<ExerciseMediaFile> mediaFiles = const [],
+    List<String> exerciseTypes = const [],
+    List<String> bodyParts = const [],
+    List<String> inventory = const [],
   });
 
   Future<Exercise> updateExercise({
@@ -30,6 +33,9 @@ abstract class ExercisesRepository {
     required List<String> steps,
     required ExerciseType type,
     List<ExerciseMediaFile> mediaFiles = const [],
+    List<String> exerciseTypes = const [],
+    List<String> bodyParts = const [],
+    List<String> inventory = const [],
   });
 
   Future<void> deleteExercise(String id);

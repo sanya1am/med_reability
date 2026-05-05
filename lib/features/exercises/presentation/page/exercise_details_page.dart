@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:med_reability/features/exercises/domain/entities/exercise_type.dart';
 import 'package:med_reability/features/exercises/presentation/widgets/exercise_instruction_card.dart';
 import 'package:med_reability/features/exercises/presentation/widgets/exercise_media_slider.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
+import 'package:med_reability/utils/widgets/app_secondary_button.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
 
 import '../../domain/entities/exercise.dart';
@@ -84,6 +86,41 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
     }
   }
 
+  Future<void> _deleteExercise() async {
+    if (exercise == null) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Удалить упражнение?'),
+          content: const Text(
+            'Это действие нельзя будет отменить.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Отмена'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Удалить'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    await ref
+        .read(exercisesViewModelProvider.notifier)
+        .removeExercise(exercise!.id);
+
+    if (!mounted) return;
+    Navigator.of(context).pop(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -119,8 +156,24 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
               Text(
                 exercise!.name,
                 style: textTheme.headlineMedium,
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 28),
+
+              Container(
+                width: double.infinity,
+                height: 46,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                    exerciseTypeLabel(exercise!.type),
+                    style: textTheme.titleSmall
+                ),
+              ),
+              const SizedBox(height: 16),
 
               Container(
                 padding: const EdgeInsets.all(20),
@@ -168,11 +221,32 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
 
               const SizedBox(height: 16),
 
-              PrimaryButton(
-                text: 'Редактировать',
-                onPressed: _openEdit,
-                height: 38,
-                textStyle: textTheme.titleSmall,
+              // PrimaryButton(
+              //   text: 'Редактировать',
+              //   onPressed: _openEdit,
+              //   height: 38,
+              //   textStyle: textTheme.titleSmall,
+              // ),
+              Row(
+                children: [
+                  Expanded(
+                    child: SecondaryButton(
+                      text: 'Удалить',
+                      onPressed: _deleteExercise,
+                      height: 38,
+                      textStyle: textTheme.titleSmall,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: PrimaryButton(
+                      text: 'Редактировать',
+                      onPressed: _openEdit,
+                      height: 38,
+                      textStyle: textTheme.titleSmall,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

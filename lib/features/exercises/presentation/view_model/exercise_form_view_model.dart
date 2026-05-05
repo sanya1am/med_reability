@@ -111,6 +111,9 @@ class ExerciseFormViewModel extends StateNotifier<ExerciseFormState> {
           steps: cleanedSteps,
           type: state.type,
           mediaFiles: state.pickedMediaFiles,
+          exerciseTypes: state.exerciseTypes,
+          bodyParts: state.bodyParts,
+          inventory: state.inventory,
         );
       } else {
         await createExerciseUseCase(
@@ -120,12 +123,18 @@ class ExerciseFormViewModel extends StateNotifier<ExerciseFormState> {
           type: state.type,
           isGlobal: state.isGlobal,
           mediaFiles: state.pickedMediaFiles,
+          exerciseTypes: state.exerciseTypes,
+          bodyParts: state.bodyParts,
+          inventory: state.inventory,
         );
       }
 
       state = state.copyWith(
         isSubmitting: false,
         clearErrorMessage: true,
+        exerciseTypes: state.exerciseTypes,
+        bodyParts: state.bodyParts,
+        inventory: state.inventory,
       );
 
       return const ExerciseFormSubmitResult.success();
@@ -146,6 +155,51 @@ class ExerciseFormViewModel extends StateNotifier<ExerciseFormState> {
 
       return ExerciseFormSubmitResult.failure(message);
     }
+  }
+
+  void toggleExerciseType(String value) {
+    final next = List<String>.from(state.exerciseTypes);
+
+    if (next.contains(value)) {
+      next.remove(value);
+    } else {
+      next.add(value);
+    }
+
+    state = state.copyWith(
+      exerciseTypes: List<String>.unmodifiable(next),
+      clearErrorMessage: true,
+    );
+  }
+
+  void toggleBodyPart(String value) {
+    final next = List<String>.from(state.bodyParts);
+
+    if (next.contains(value)) {
+      next.remove(value);
+    } else {
+      next.add(value);
+    }
+
+    state = state.copyWith(
+      bodyParts: List<String>.unmodifiable(next),
+      clearErrorMessage: true,
+    );
+  }
+
+  void toggleInventory(String value) {
+    final next = List<String>.from(state.inventory);
+
+    if (next.contains(value)) {
+      next.remove(value);
+    } else {
+      next.add(value);
+    }
+
+    state = state.copyWith(
+      inventory: List<String>.unmodifiable(next),
+      clearErrorMessage: true,
+    );
   }
 }
 
