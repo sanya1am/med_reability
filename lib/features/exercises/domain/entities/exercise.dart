@@ -9,6 +9,11 @@ class Exercise {
   final List<String> mediaUrls;
   final bool isDeleted;
   final ExerciseType type;
+
+  final List<String> exerciseTypes;
+  final List<String> bodyParts;
+  final List<String> inventory;
+
   final List<String> steps;
 
   const Exercise({
@@ -20,6 +25,9 @@ class Exercise {
     required this.mediaUrls,
     required this.isDeleted,
     required this.type,
+    required this.exerciseTypes,
+    required this.bodyParts,
+    required this.inventory,
     required this.steps,
   });
 

@@ -12,8 +12,11 @@ class CreateExerciseUseCase {
     required String description,
     required List<String> steps,
     required ExerciseType type,
-    required bool isGlobal,
+    bool isGlobal = true,
     List<ExerciseMediaFile> mediaFiles = const [],
+    List<String> exerciseTypes = const [],
+    List<String> bodyParts = const [],
+    List<String> inventory = const [],
   }) {
     return _repo.createExercise(
       name: name,
@@ -22,6 +25,9 @@ class CreateExerciseUseCase {
       type: type,
       isGlobal: isGlobal,
       mediaFiles: mediaFiles,
+      exerciseTypes: exerciseTypes,
+      bodyParts: bodyParts,
+      inventory: inventory,
     );
   }
 }

@@ -1,18 +1,27 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:med_reability/core/di/providers.dart';
+import 'package:med_reability/features/exercises/domain/entities/exercise.dart';
+import 'package:med_reability/features/exercises/domain/entities/exercise_filter_options.dart';
+import 'package:med_reability/features/exercises/domain/entities/exercise_media_file.dart';
+import 'package:med_reability/features/exercises/domain/entities/exercise_type.dart';
 import 'package:med_reability/features/exercises/presentation/state/exercise_form_state.dart';
+import 'package:med_reability/features/exercises/presentation/view_model/exercise_form_view_model.dart';
+import 'package:med_reability/features/exercises/presentation/widgets/exercise_create_media_upload_box.dart';
+import 'package:med_reability/features/exercises/presentation/widgets/exercise_create_step_input.dart';
+import 'package:med_reability/features/exercises/presentation/widgets/filters/exercise_filter_chip_section.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
+import 'package:med_reability/utils/widgets/app_secondary_button.dart';
+import 'package:med_reability/utils/widgets/app_text_field.dart';
+import 'package:med_reability/utils/widgets/app_top_actions_bar.dart';
+import 'package:med_reability/utils/widgets/primary_button.dart';
 
-import '../../../../utils/widgets/app_text_field.dart';
-import '../../../../utils/widgets/primary_button.dart';
-import '../../domain/entities/exercise.dart';
-import '../../domain/entities/exercise_media_file.dart';
-import '../view_model/exercise_form_view_model.dart';
-import '../widgets/exercise_create_media_upload_box.dart';
-import '../widgets/exercise_create_step_input.dart';
-import '../../../../utils/widgets/app_top_actions_bar.dart';
-import '../widgets/exercise_type_dropdown.dart';
+
+final _exerciseFormFilterOptionsProvider =
+FutureProvider.autoDispose<ExerciseFilterOptions>((ref) {
+  return ref.read(getExerciseFilterOptionsUseCaseProvider).call();
+});
 
 class ExerciseFormPage extends ConsumerStatefulWidget {
   final Exercise? initialExercise;
@@ -38,12 +47,12 @@ class _ExerciseFormPageState extends ConsumerState<ExerciseFormPage> {
   void initState() {
     super.initState();
 
-    final e = widget.initialExercise;
+    final exercise = widget.initialExercise;
 
-    nameCtrl = TextEditingController(text: e?.name ?? '');
-    descCtrl = TextEditingController(text: e?.description ?? '');
+    nameCtrl = TextEditingController(text: exercise?.name ?? '');
+    descCtrl = TextEditingController(text: exercise?.description ?? '');
 
-    final initialSteps = e?.steps ?? const <String>[];
+    final initialSteps = exercise?.steps ?? const <String>[];
     steps = initialSteps.isNotEmpty
         ? initialSteps.map((s) => TextEditingController(text: s)).toList()
         : [TextEditingController()];
@@ -53,9 +62,11 @@ class _ExerciseFormPageState extends ConsumerState<ExerciseFormPage> {
   void dispose() {
     nameCtrl.dispose();
     descCtrl.dispose();
-    for (final c in steps) {
-      c.dispose();
+
+    for (final controller in steps) {
+      controller.dispose();
     }
+
     super.dispose();
   }
 
@@ -70,22 +81,24 @@ class _ExerciseFormPageState extends ConsumerState<ExerciseFormPage> {
     if (result == null || result.files.isEmpty) return;
 
     final files = result.files
-        .where((f) => f.bytes != null)
+        .where((file) => file.bytes != null)
         .map(
-          (f) => ExerciseMediaFile(
-        name: f.name,
-        bytes: f.bytes!,
+          (file) => ExerciseMediaFile(
+        name: file.name,
+        bytes: file.bytes!,
       ),
     )
         .toList();
 
     if (files.isEmpty) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Не удалось прочитать выбранные файлы'),
         ),
       );
+
       return;
     }
 
@@ -104,6 +117,7 @@ class _ExerciseFormPageState extends ConsumerState<ExerciseFormPage> {
 
   void _removeStep(int index) {
     if (steps.length == 1) return;
+
     setState(() {
       steps[index].dispose();
       steps.removeAt(index);
@@ -111,7 +125,7 @@ class _ExerciseFormPageState extends ConsumerState<ExerciseFormPage> {
   }
 
   Future<void> _submit(ExerciseFormState formState) async {
-    final stepsList = steps.map((c) => c.text).toList(growable: false);
+    final stepsList = steps.map((controller) => controller.text).toList();
 
     if (formState.requiresMediaReplacementConfirmation) {
       final shouldContinue = await showDialog<bool>(
@@ -163,10 +177,11 @@ class _ExerciseFormPageState extends ConsumerState<ExerciseFormPage> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final colors = context.appColors;
     final formState = ref.watch(
       exerciseFormViewModelProvider(widget.initialExercise),
     );
+
+    final filterOptionsAsync = ref.watch(_exerciseFormFilterOptionsProvider);
 
     final submitText = formState.isEdit ? 'Сохранить' : 'Создать';
 
@@ -184,82 +199,88 @@ class _ExerciseFormPageState extends ConsumerState<ExerciseFormPage> {
                     onBack: () => Navigator.pop(context),
                     onNotify: () {},
                   ),
+
                   const SizedBox(height: 16),
 
-                  if (formState.isEdit && formState.existingMediaUrls.isNotEmpty) ...[
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: colors.border),
-                      ),
-                      child: Text(
-                        'Текущие медиафайлы будут заменены новыми при сохранении.',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colors.textPrimary,
-                        ),
-                      ),
-                    ),
+                  if (formState.isEdit &&
+                      formState.existingMediaUrls.isNotEmpty) ...[
+                    _MediaReplacementWarning(),
+                    const SizedBox(height: 12),
                   ],
 
                   ExerciseCreateMediaUploadBox(
                     onTap: _pickMedia,
                     existingMediaUrls: formState.existingMediaUrls,
                     pickedFileNames: formState.pickedMediaFiles
-                        .map((e) => e.name)
+                        .map((file) => file.name)
                         .toList(growable: false),
                     onRemovePicked: _removePickedMediaAt,
                   ),
+
                   const SizedBox(height: 18),
 
-                  Text('Название', style: textTheme.bodyMedium),
+                  _SectionTitle(text: 'Тип'),
+                  const SizedBox(height: 8),
+                  _ExerciseTrackingTypeSelector(
+                    value: formState.type,
+                    onChanged: _vm.setType,
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  _SectionTitle(text: 'Название'),
                   const SizedBox(height: 8),
                   AppTextField(
                     hintText: 'Введите название упражнения',
                     controller: nameCtrl,
                   ),
+
                   const SizedBox(height: 14),
 
-                  Text('Описание', style: textTheme.bodyMedium),
+                  _SectionTitle(text: 'Описание'),
                   const SizedBox(height: 8),
                   AppTextField(
                     hintText: 'Введите описание упражнения',
                     controller: descCtrl,
                     maxLines: 4,
                   ),
+
                   const SizedBox(height: 14),
 
-                  Text('Тип упражнения', style: textTheme.bodyMedium),
-                  const SizedBox(height: 8),
-                  ExerciseTypeDropdown(
-                    value: formState.type,
-                    onChanged: _vm.setType,
-                  ),
-                  const SizedBox(height: 16),
-
                   if (!formState.isEdit) ...[
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Сделать доступным всем инструкторам клиники',
-                            style: textTheme.bodyMedium,
-                          ),
-                        ),
-                        Switch(
-                          value: formState.isGlobal,
-                          onChanged: _vm.setIsGlobal,
-                        ),
-                      ],
+                    _PrivateAccessSwitch(
+                      isPrivate: !formState.isGlobal,
+                      onChanged: (value) {
+                        _vm.setIsGlobal(!value);
+                      },
                     ),
                     const SizedBox(height: 16),
                   ],
 
-                  Text('Инструкция', style: textTheme.bodyMedium),
+                  filterOptionsAsync.when(
+                    loading: () => const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Center(
+                        child: SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    ),
+                    error: (_, __) => const _FilterOptionsLoadError(),
+                    data: (options) {
+                      return _ExerciseFilterOptionsFields(
+                        options: options,
+                        formState: formState,
+                        vm: _vm,
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  _SectionTitle(text: 'Инструкция'),
                   const SizedBox(height: 10),
 
                   ...List.generate(steps.length, (index) {
@@ -272,33 +293,281 @@ class _ExerciseFormPageState extends ConsumerState<ExerciseFormPage> {
                   }),
 
                   const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: PrimaryButton(
-                      text: 'Добавить шаг',
-                      onPressed: formState.isSubmitting ? null : _addStep,
-                      height: 38,
-                      textStyle: textTheme.titleSmall,
-                    ),
+
+                  SecondaryButton(
+                    text: 'Добавить шаг',
+                    onPressed: formState.isSubmitting ? null : _addStep,
+                    height: 38,
+                    textStyle: textTheme.titleSmall,
                   ),
+
                   const SizedBox(height: 16),
 
-                  SizedBox(
-                    width: double.infinity,
-                    child: PrimaryButton(
-                      text: submitText,
-                      onPressed: formState.isSubmitting
-                          ? null
-                          : () => _submit(formState),
-                      loading: formState.isSubmitting,
-                      height: 38,
-                      textStyle: textTheme.titleSmall,
-                    ),
+                  PrimaryButton(
+                    text: submitText,
+                    onPressed: formState.isSubmitting
+                        ? null
+                        : () => _submit(formState),
+                    loading: formState.isSubmitting,
+                    height: 38,
+                    textStyle: textTheme.titleSmall,
                   ),
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MediaReplacementWarning extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: colors.border,
+        ),
+      ),
+      child: Text(
+        'Текущие медиафайлы будут заменены новыми при сохранении.',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: colors.textPrimary,
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String text;
+
+  const _SectionTitle({
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+        fontSize: 18,
+      ),
+    );
+  }
+}
+
+class _ExerciseTrackingTypeSelector extends StatelessWidget {
+  final ExerciseType value;
+  final ValueChanged<ExerciseType?> onChanged;
+
+  const _ExerciseTrackingTypeSelector({
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final brightness = Theme.of(context).brightness;
+
+    final selectedBackground = brightness == Brightness.dark
+        ? colors.surface
+        : colors.background;
+
+    return Container(
+      width: double.infinity,
+      height: 38,
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: colors.dialogBackground,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _TrackingTypeSegment(
+              text: 'Время',
+              selected: value == ExerciseType.time,
+              selectedBackground: selectedBackground,
+              onTap: () => onChanged(ExerciseType.time),
+            ),
+          ),
+          Expanded(
+            child: _TrackingTypeSegment(
+              text: 'Подходы',
+              selected: value == ExerciseType.repetition,
+              selectedBackground: selectedBackground,
+              onTap: () => onChanged(ExerciseType.repetition),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TrackingTypeSegment extends StatelessWidget {
+  final String text;
+  final bool selected;
+  final Color selectedBackground;
+  final VoidCallback onTap;
+
+  const _TrackingTypeSegment({
+    required this.text,
+    required this.selected,
+    required this.selectedBackground,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOut,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? selectedBackground : Colors.transparent,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: colors.textPrimary,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class _PrivateAccessSwitch extends StatelessWidget {
+  final bool isPrivate;
+  final ValueChanged<bool> onChanged;
+
+  const _PrivateAccessSwitch({
+    required this.isPrivate,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Switch(
+          value: isPrivate,
+          onChanged: onChanged,
+        ),
+
+        Expanded(
+          child: Text(
+            'Приватный доступ',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colors.textPrimary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ExerciseFilterOptionsFields extends StatelessWidget {
+  final ExerciseFilterOptions options;
+  final ExerciseFormState formState;
+  final ExerciseFormViewModel vm;
+
+  const _ExerciseFilterOptionsFields({
+    required this.options,
+    required this.formState,
+    required this.vm,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final titleStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
+      fontSize: 18,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (options.bodyParts.isNotEmpty) ...[
+          ExerciseFilterChipSection(
+            title: 'Часть тела',
+            values: options.bodyParts,
+            selectedValues: formState.bodyParts,
+            onToggle: vm.toggleBodyPart,
+            textStyle: titleStyle,
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        if (options.inventory.isNotEmpty) ...[
+          ExerciseFilterChipSection(
+            title: 'Инвентарь',
+            values: options.inventory,
+            selectedValues: formState.inventory,
+            onToggle: vm.toggleInventory,
+            textStyle: titleStyle,
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        if (options.exerciseTypes.isNotEmpty) ...[
+          ExerciseFilterChipSection(
+            title: 'Тип упражнения',
+            values: options.exerciseTypes,
+            selectedValues: formState.exerciseTypes,
+            onToggle: vm.toggleExerciseType,
+            textStyle: titleStyle,
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _FilterOptionsLoadError extends StatelessWidget {
+  const _FilterOptionsLoadError();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: colors.border,
+        ),
+      ),
+      child: Text(
+        'Не удалось загрузить дополнительные фильтры упражнения. '
+            'Можно сохранить упражнение без них.',
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: colors.textSecondary,
         ),
       ),
     );

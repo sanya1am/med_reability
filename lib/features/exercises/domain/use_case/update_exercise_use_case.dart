@@ -14,6 +14,9 @@ class UpdateExerciseUseCase {
     required List<String> steps,
     required ExerciseType type,
     List<ExerciseMediaFile> mediaFiles = const [],
+    List<String> exerciseTypes = const [],
+    List<String> bodyParts = const [],
+    List<String> inventory = const [],
   }) {
     return _repo.updateExercise(
       id: id,
@@ -22,6 +25,9 @@ class UpdateExerciseUseCase {
       steps: steps,
       type: type,
       mediaFiles: mediaFiles,
+      exerciseTypes: exerciseTypes,
+      bodyParts: bodyParts,
+      inventory: inventory,
     );
   }
 }

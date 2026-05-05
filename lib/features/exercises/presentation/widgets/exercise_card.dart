@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:med_reability/features/exercises/domain/entities/exercise.dart';
 import 'package:med_reability/features/exercises/domain/entities/exercise_type.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
+import 'package:med_reability/utils/widgets/app_secondary_button.dart';
 
 class ExerciseCard extends StatelessWidget {
   final Exercise exercise;
-  final VoidCallback onTap;
+  final VoidCallback onDetailsTap;
 
   const ExerciseCard({
+    super.key,
     required this.exercise,
-    required this.onTap,
+    required this.onDetailsTap,
   });
 
   @override
@@ -21,40 +23,49 @@ class ExerciseCard extends StatelessWidget {
         ? 'На повторения'
         : 'На время';
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 18,
-              offset: const Offset(0, 8),
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.black.withOpacity(0.18)
-                  : const Color(0x22000000),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            exercise.name,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: colors.textSecondary,
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              exercise.name,
-              style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            exercise.description,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colors.textPrimary,
             ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: colors.textSecondary,
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: SecondaryButton(
+              text: 'Подробнее',
+              onPressed: onDetailsTap,
+              height: 38,
+              textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontSize: 12,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

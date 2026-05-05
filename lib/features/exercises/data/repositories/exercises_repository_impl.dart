@@ -6,6 +6,8 @@ import '../../domain/entities/exercise_media_file.dart';
 import '../../domain/entities/exercise_type.dart';
 import '../../domain/repositories/exercises_repository.dart';
 import '../models/exercise_dto.dart';
+import '../models/exercise_filter_options_dto.dart';
+import '../../domain/entities/exercise_filter_options.dart';
 
 
 class ExercisesRepositoryImpl implements ExercisesRepository {
@@ -92,8 +94,11 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
     required String description,
     required List<String> steps,
     required ExerciseType type,
-    required bool isGlobal,
+    bool isGlobal = true,
     List<ExerciseMediaFile> mediaFiles = const [],
+    List<String> exerciseTypes = const [],
+    List<String> bodyParts = const [],
+    List<String> inventory = const [],
   }) async {
     try {
       final fd = FormData();
@@ -107,6 +112,10 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
       for (final s in steps.where((x) => x.trim().isNotEmpty)) {
         fd.fields.add(MapEntry('Steps', s));
       }
+
+      _addStringListFields(fd, 'ExerciseTypes', exerciseTypes);
+      _addStringListFields(fd, 'BodyParts', bodyParts);
+      _addStringListFields(fd, 'Inventory', inventory);
 
       for (final file in mediaFiles) {
         fd.files.add(
@@ -146,6 +155,9 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
     required List<String> steps,
     required ExerciseType type,
     List<ExerciseMediaFile> mediaFiles = const [],
+    List<String> exerciseTypes = const [],
+    List<String> bodyParts = const [],
+    List<String> inventory = const [],
   }) async {
     try {
       final fd = FormData();
@@ -158,6 +170,10 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
       for (final s in steps.where((x) => x.trim().isNotEmpty)) {
         fd.fields.add(MapEntry('Steps', s));
       }
+
+      _addStringListFields(fd, 'ExerciseTypes', exerciseTypes);
+      _addStringListFields(fd, 'BodyParts', bodyParts);
+      _addStringListFields(fd, 'Inventory', inventory);
 
       for (final file in mediaFiles) {
         fd.files.add(
@@ -205,6 +221,35 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
       if (code == 403) throw Exception('Недостаточно прав');
       if (code == 404) throw Exception('Упражнение не найдено');
       throw Exception('Не удалось удалить упражнение');
+    }
+  }
+
+  @override
+  Future<ExerciseFilterOptions> getFilterOptions() async {
+    try {
+      final res = await _dio.get(
+        '/api/exercises/filter-options',
+        options: await _authOptions(),
+      );
+
+      return ExerciseFilterOptionsDto
+          .fromJson(res.data as Map<String, dynamic>)
+          .toEntity();
+    } on DioException catch (e) {
+      final code = e.response?.statusCode;
+      if (code == 401) throw const UnauthorizedException();
+      if (code == 403) throw Exception('Недостаточно прав');
+      throw Exception('Не удалось загрузить фильтры упражнений');
+    }
+  }
+
+  void _addStringListFields(
+      FormData fd,
+      String fieldName,
+      List<String> values,
+      ) {
+    for (final value in values.map((x) => x.trim()).where((x) => x.isNotEmpty)) {
+      fd.fields.add(MapEntry(fieldName, value));
     }
   }
 }
