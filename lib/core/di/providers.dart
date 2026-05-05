@@ -37,6 +37,9 @@ import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/use_case/login_use_case.dart';
 import '../../features/auth/domain/use_case/logout_use_case.dart';
 import '../../features/auth/domain/use_case/search_clinics_use_case.dart';
+import '../../features/doctor/data/repositories/doctor_patient_overview_repository_impl.dart';
+import '../../features/doctor/domain/repositories/doctor_patient_overview_repository.dart';
+import '../../features/doctor/domain/use_case/get_doctor_patient_overview_use_case.dart';
 import '../../features/exercises/domain/use_case/delete_exercise_use_case.dart';
 import '../../features/exercises/domain/use_case/get_exercise_filter_options_use_case.dart';
 import '../../features/profile/domain/use_case/change_my_password_use_case.dart';
@@ -84,6 +87,9 @@ final exercisesRepositoryProvider = Provider<ExercisesRepository>((ref) {
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
   return ProfileRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
 });
+final doctorPatientOverviewRepositoryProvider = Provider<DoctorPatientOverviewRepository>((ref) {
+  return DoctorPatientOverviewRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
+});
 
 // use cases
 final loginUseCaseProvider = Provider((ref) => LoginUseCase(ref.read(authRepositoryProvider)));
@@ -105,4 +111,5 @@ final getExerciseByIdUseCaseProvider = Provider((ref) => GetExerciseByIdUseCase(
 final updateExerciseUseCaseProvider = Provider((ref) => UpdateExerciseUseCase(ref.read(exercisesRepositoryProvider)));
 final updateMyProfileUseCaseProvider = Provider((ref) => UpdateMyProfileUseCase(ref.read(profileRepositoryProvider)));
 final changeMyPasswordUseCaseProvider = Provider((ref) => ChangeMyPasswordUseCase(ref.read(profileRepositoryProvider)));
+final getDoctorPatientOverviewUseCaseProvider = Provider((ref) => GetDoctorPatientOverviewUseCase(ref.read(doctorPatientOverviewRepositoryProvider)));
 final getExerciseFilterOptionsUseCaseProvider = Provider((ref) => GetExerciseFilterOptionsUseCase(ref.read(exercisesRepositoryProvider)));

@@ -4,6 +4,7 @@ import 'package:med_reability/features/doctor/presentation/widgets/patient_card.
 import 'package:med_reability/utils/theme/app_theme.dart';
 import '../../../../utils/widgets/app_text_field.dart';
 import '../view_model/doctor_patients_view_model.dart';
+import 'doctor_patient_overview_page.dart';
 
 
 class DoctorPatientsPage extends ConsumerStatefulWidget {
@@ -133,6 +134,15 @@ class _DoctorPatientsPageState extends ConsumerState<DoctorPatientsPage> {
                       (p) => PatientCard(
                     name: p.fullName,
                     subtitle: p.phoneNumber,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => DoctorPatientOverviewPage(
+                            patientId: p.patientId,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
             ],
