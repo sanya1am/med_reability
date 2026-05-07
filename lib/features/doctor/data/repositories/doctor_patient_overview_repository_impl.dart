@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:med_reability/core/errors/unauthorized_exception.dart';
 import 'package:med_reability/core/services/token_storage.dart';
 import '../../domain/entities/doctor_patient_overview.dart';
@@ -52,6 +53,14 @@ class DoctorPatientOverviewRepositoryImpl
           .toEntity();
     } on DioException catch (e) {
       final code = e.response?.statusCode;
+
+      debugPrint(
+        'PATIENT OVERVIEW ERROR: '
+            'patientId=$patientId, '
+            'startDate=$startDate, '
+            'status=$code, '
+            'data=${e.response?.data}',
+      );
 
       if (code == 401) throw const UnauthorizedException();
       if (code == 403) throw Exception('Недостаточно прав');

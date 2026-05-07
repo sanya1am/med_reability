@@ -7,6 +7,7 @@ class DoctorPatient {
   final String email;
   final String phoneNumber;
   final bool isActive;
+  final bool hasPlan;
 
   const DoctorPatient({
     required this.assignmentId,
@@ -17,6 +18,7 @@ class DoctorPatient {
     required this.email,
     required this.phoneNumber,
     required this.isActive,
+    required this.hasPlan,
   });
 
   String get fullFullName {

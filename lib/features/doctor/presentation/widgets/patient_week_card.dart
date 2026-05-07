@@ -7,15 +7,20 @@ class PatientWeekCard extends StatelessWidget {
   final int weekNumber;
   final List<DoctorPatientOverviewDay> days;
   final DateTime selectedDate;
+  final bool canGoPreviousWeek;
+  final bool canGoNextWeek;
   final VoidCallback onPreviousWeek;
   final VoidCallback onNextWeek;
   final ValueChanged<DoctorPatientOverviewDay> onDayTap;
+
 
   const PatientWeekCard({
     super.key,
     required this.weekNumber,
     required this.days,
     required this.selectedDate,
+    required this.canGoPreviousWeek,
+    required this.canGoNextWeek,
     required this.onPreviousWeek,
     required this.onNextWeek,
     required this.onDayTap,
@@ -44,11 +49,13 @@ class PatientWeekCard extends StatelessWidget {
               ),
               _WeekArrowButton(
                 icon: Icons.chevron_left,
+                enabled: canGoPreviousWeek,
                 onTap: onPreviousWeek,
               ),
               const SizedBox(width: 8),
               _WeekArrowButton(
                 icon: Icons.chevron_right,
+                enabled: canGoNextWeek,
                 onTap: onNextWeek,
               ),
             ],
@@ -63,9 +70,12 @@ class PatientWeekCard extends StatelessWidget {
   }
 
   List<Widget> _buildDayItems() {
-    if (days.isEmpty) {
+    final sortedDays = [...days]
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    if (sortedDays.isEmpty) {
       return List.generate(7, (index) {
-        final number = index + 1;
+        final number = _fallbackDayNumber(index);
 
         return Expanded(
           child: _DayButton(
@@ -79,27 +89,32 @@ class PatientWeekCard extends StatelessWidget {
       });
     }
 
-    return days.map((day) {
+    return List.generate(sortedDays.length, (index) {
+      final day = sortedDays[index];
       final selected = _isSameDate(day.date, selectedDate);
 
       return Expanded(
         child: _DayButton(
-          label: _resolveDayLabel(day),
+          label: _resolveDayLabel(day, index).toString(),
           selected: selected,
           hasTraining: day.hasTraining,
           isCompleted: day.isCompleted,
           onTap: () => onDayTap(day),
         ),
       );
-    }).toList();
+    });
   }
 
-  String _resolveDayLabel(DoctorPatientOverviewDay day) {
+  int _resolveDayLabel(DoctorPatientOverviewDay day, int index) {
     if (day.dayNumber > 0) {
-      return day.dayNumber.toString();
+      return day.dayNumber;
     }
 
-    return day.date.day.toString();
+    return _fallbackDayNumber(index);
+  }
+
+  int _fallbackDayNumber(int index) {
+    return (weekNumber - 1) * 7 + index + 1;
   }
 
   bool _isSameDate(DateTime a, DateTime b) {
@@ -109,10 +124,12 @@ class PatientWeekCard extends StatelessWidget {
 
 class _WeekArrowButton extends StatelessWidget {
   final IconData icon;
+  final bool enabled;
   final VoidCallback onTap;
 
   const _WeekArrowButton({
     required this.icon,
+    required this.enabled,
     required this.onTap,
   });
 
@@ -121,7 +138,7 @@ class _WeekArrowButton extends StatelessWidget {
     final colors = context.appColors;
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       behavior: HitTestBehavior.opaque,
       child: Container(
         width: 34,
@@ -133,7 +150,7 @@ class _WeekArrowButton extends StatelessWidget {
         child: Icon(
           icon,
           size: 22,
-          color: colors.textPrimary,
+          color: enabled ? colors.textPrimary : colors.hint,
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/di/providers.dart';
+import '../../../../core/di/session_scope.dart';
 import '../../../../core/errors/unauthorized_exception.dart';
 import '../../../auth/presentation/view_model/auth_view_model.dart';
 import '../../domain/entities/exercise.dart';
@@ -18,6 +19,7 @@ class ExercisesViewModel extends AsyncNotifier<ExercisesState> {
   @override
   Future<ExercisesState> build() async {
     try {
+      ref.watch(sessionEpochProvider);
       final filterOptions = await getFilterOptions();
       final list = await getExercises(pageNumber: 1, pageSize: 100, all: true);
 

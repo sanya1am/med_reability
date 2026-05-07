@@ -10,6 +10,7 @@ class DoctorPatientDto {
   final String email;
   final String phoneNumber;
   final bool isActive;
+  final bool hasPlan;
 
   DoctorPatientDto({
     required this.assignmentId,
@@ -20,6 +21,7 @@ class DoctorPatientDto {
     required this.email,
     required this.phoneNumber,
     required this.isActive,
+    required this.hasPlan,
   });
 
   factory DoctorPatientDto.fromJson(Map<String, dynamic> json) => DoctorPatientDto(
@@ -31,6 +33,7 @@ class DoctorPatientDto {
     email: (json['email'] as String?) ?? '',
     phoneNumber: (json['phoneNumber'] as String?) ?? '',
     isActive: (json['isActive'] as bool?) ?? false,
+    hasPlan: (json['hasPlan'] as bool?) ?? false,
   );
 
   DoctorPatient toEntity() => DoctorPatient(
@@ -42,5 +45,6 @@ class DoctorPatientDto {
     email: email,
     phoneNumber: phoneNumber,
     isActive: isActive,
+    hasPlan: hasPlan,
   );
 }

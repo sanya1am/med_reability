@@ -12,21 +12,16 @@ class DoctorPatientOverviewHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
-
     return Column(
       children: [
         _PatientAvatar(
           imageUrl: patient.imageUrl,
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
         Text(
           patient.fullName.isEmpty ? 'Пациент' : patient.fullName,
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontSize: 18,
-            color: colors.textPrimary,
-          ),
+          style: Theme.of(context).textTheme.titleMedium
         ),
       ],
     );
@@ -46,8 +41,8 @@ class _PatientAvatar extends StatelessWidget {
     final url = imageUrl;
 
     return Container(
-      width: 104,
-      height: 104,
+      width: 120,
+      height: 120,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: colors.surface,

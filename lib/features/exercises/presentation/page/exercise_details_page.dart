@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:med_reability/features/exercises/domain/entities/exercise_type.dart';
-import 'package:med_reability/features/exercises/presentation/widgets/exercise_instruction_card.dart';
-import 'package:med_reability/features/exercises/presentation/widgets/exercise_media_slider.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/app_secondary_button.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
-
 import '../../domain/entities/exercise.dart';
 import '../view_model/exercises_view_model.dart';
 import '../../../../utils/widgets/app_top_actions_bar.dart';
+import '../widgets/exercise_details_content.dart';
 import 'exercise_form_page.dart';
 
 class ExerciseDetailsPage extends ConsumerStatefulWidget {
@@ -150,103 +147,29 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
               ),
               const SizedBox(height: 16),
 
-              ExerciseMediaSlider(mediaUrls: exercise!.mediaUrls),
-              const SizedBox(height: 16),
-
-              Text(
-                exercise!.name,
-                style: textTheme.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 28),
-
-              Container(
-                width: double.infinity,
-                height: 46,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: colors.surface,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                    exerciseTypeLabel(exercise!.type),
-                    style: textTheme.titleSmall
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: colors.surface,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black.withOpacity(0.18)
-                          : const Color(0x22000000),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              ExerciseDetailsContent(
+                exercise: exercise!,
+                bottomActions: Row(
                   children: [
-                    Text('Описание', style: textTheme.titleMedium),
-                    const SizedBox(height: 4),
-                    Text(
-                      exercise!.description,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colors.textPrimary,
+                    Expanded(
+                      child: SecondaryButton(
+                        text: 'Удалить',
+                        onPressed: _deleteExercise,
+                        height: 38,
+                        textStyle: textTheme.titleSmall,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: PrimaryButton(
+                        text: 'Редактировать',
+                        onPressed: _openEdit,
+                        height: 38,
+                        textStyle: textTheme.titleSmall,
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 16),
-
-              Text('Инструкция', style: textTheme.titleMedium),
-              const SizedBox(height: 12),
-
-              ...List.generate(exercise!.steps.length, (index) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: ExerciseInstructionCard(
-                    number: index + 1,
-                    text: exercise!.steps[index],
-                  ),
-                );
-              }),
-
-              const SizedBox(height: 16),
-
-              // PrimaryButton(
-              //   text: 'Редактировать',
-              //   onPressed: _openEdit,
-              //   height: 38,
-              //   textStyle: textTheme.titleSmall,
-              // ),
-              Row(
-                children: [
-                  Expanded(
-                    child: SecondaryButton(
-                      text: 'Удалить',
-                      onPressed: _deleteExercise,
-                      height: 38,
-                      textStyle: textTheme.titleSmall,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: PrimaryButton(
-                      text: 'Редактировать',
-                      onPressed: _openEdit,
-                      height: 38,
-                      textStyle: textTheme.titleSmall,
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
