@@ -30,25 +30,21 @@ class PatientWeekProgressCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   'Прогресс за неделю',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontSize: 18,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium
                 ),
               ),
               Text(
                 '$normalizedPercent%',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontSize: 18,
-                ),
+                style: Theme.of(context).textTheme.titleMedium
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: LinearProgressIndicator(
               value: normalizedPercent / 100,
-              minHeight: 8,
+              minHeight: 12,
               backgroundColor: colors.background,
               valueColor: AlwaysStoppedAnimation<Color>(primary),
             ),

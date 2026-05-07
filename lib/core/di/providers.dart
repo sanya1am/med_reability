@@ -44,6 +44,12 @@ import '../../features/exercises/domain/use_case/delete_exercise_use_case.dart';
 import '../../features/exercises/domain/use_case/get_exercise_filter_options_use_case.dart';
 import '../../features/profile/domain/use_case/change_my_password_use_case.dart';
 import '../../features/profile/domain/use_case/update_my_profile_use_case.dart';
+import '../../features/rehabilitation_plan/data/repositories/rehabilitation_program_repository_impl.dart';
+import '../../features/rehabilitation_plan/domain/repositories/rehabilitation_program_repository.dart';
+import '../../features/rehabilitation_plan/domain/use_case/create_rehabilitation_program_use_case.dart';
+import '../../features/rehabilitation_plan/domain/use_case/delete_rehabilitation_program_use_case.dart';
+import '../../features/rehabilitation_plan/domain/use_case/get_rehabilitation_program_use_case.dart';
+import '../../features/rehabilitation_plan/domain/use_case/update_rehabilitation_program_use_case.dart';
 import '../services/token_storage.dart';
 
 final baseUrlProvider = Provider<String>((_) {
@@ -90,6 +96,9 @@ final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
 final doctorPatientOverviewRepositoryProvider = Provider<DoctorPatientOverviewRepository>((ref) {
   return DoctorPatientOverviewRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
 });
+final rehabilitationProgramRepositoryProvider = Provider<RehabilitationProgramRepository>((ref) {
+  return RehabilitationProgramRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
+});
 
 // use cases
 final loginUseCaseProvider = Provider((ref) => LoginUseCase(ref.read(authRepositoryProvider)));
@@ -113,3 +122,7 @@ final updateMyProfileUseCaseProvider = Provider((ref) => UpdateMyProfileUseCase(
 final changeMyPasswordUseCaseProvider = Provider((ref) => ChangeMyPasswordUseCase(ref.read(profileRepositoryProvider)));
 final getDoctorPatientOverviewUseCaseProvider = Provider((ref) => GetDoctorPatientOverviewUseCase(ref.read(doctorPatientOverviewRepositoryProvider)));
 final getExerciseFilterOptionsUseCaseProvider = Provider((ref) => GetExerciseFilterOptionsUseCase(ref.read(exercisesRepositoryProvider)));
+final createRehabilitationProgramUseCaseProvider = Provider((ref) => CreateRehabilitationProgramUseCase(ref.read(rehabilitationProgramRepositoryProvider)));
+final updateRehabilitationProgramUseCaseProvider = Provider((ref) => UpdateRehabilitationProgramUseCase(ref.read(rehabilitationProgramRepositoryProvider)));
+final getRehabilitationProgramUseCaseProvider = Provider((ref) => GetRehabilitationProgramUseCase(ref.read(rehabilitationProgramRepositoryProvider)));
+final deleteRehabilitationProgramUseCaseProvider = Provider((ref) => DeleteRehabilitationProgramUseCase(ref.read(rehabilitationProgramRepositoryProvider)));

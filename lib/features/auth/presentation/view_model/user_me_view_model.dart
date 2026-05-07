@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/di/providers.dart';
+import '../../../../core/di/session_scope.dart';
 import '../../../../core/errors/unauthorized_exception.dart';
 import '../../domain/entities/user_me.dart';
 import 'auth_view_model.dart';
@@ -10,6 +11,7 @@ class UserMeViewModel extends AsyncNotifier<UserMe?> {
 
   @override
   Future<UserMe?> build() async {
+    ref.watch(sessionEpochProvider);
     final authed = ref.watch(authViewModelProvider.select((s) => s.isAuthed));
     if (!authed) return null;
 

@@ -20,7 +20,7 @@ class PatientOverviewEmptyState extends StatelessWidget {
 
     return Column(
       children: [
-        const SizedBox(height: 38),
+        const SizedBox(height: 36),
         Icon(
           Icons.info_outline,
           size: 42,

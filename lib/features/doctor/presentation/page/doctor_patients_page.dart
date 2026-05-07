@@ -130,11 +130,14 @@ class _DoctorPatientsPageState extends ConsumerState<DoctorPatientsPage> {
                   ),
                 )
               else
-                ...filtered.map(
-                      (p) => PatientCard(
+                ...filtered.map((p) =>
+                  PatientCard(
                     name: p.fullName,
                     subtitle: p.phoneNumber,
+                    hasPlan: p.hasPlan,
                     onTap: () {
+                      debugPrint('OPEN PATIENT OVERVIEW: id=${p.patientId}, name=${p.fullName}');
+
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => DoctorPatientOverviewPage(

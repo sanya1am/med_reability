@@ -1,26 +1,20 @@
+import '../../../rehabilitation_plan/domain/entities/rehabilitation_program.dart';
+import '../../../rehabilitation_plan/domain/entities/rehabilitation_program_day.dart';
+import '../../../rehabilitation_plan/domain/entities/rehabilitation_program_exercise.dart';
 import '../../domain/entities/doctor_patient_overview.dart';
 import '../../domain/entities/doctor_patient_overview_day.dart';
 
 class DoctorPatientOverviewState {
   final String patientId;
   final DoctorPatientOverview overview;
-
-  /// Дата начала текущей отображаемой недели.
-  ///
-  /// Это значение отправляется в query-параметр `startDate`
-  /// при переключении недель.
+  final RehabilitationProgram? program;
   final DateTime weekStartDate;
-
-  /// Выбранный день внутри текущей недели.
-  ///
-  /// Сейчас endpoint возвращает `todayWorkout`, поэтому выбранная дата
-  /// в первую очередь нужна для UI: подсветка дня, заголовок даты,
-  /// будущая привязка к тренировке выбранного дня.
   final DateTime selectedDate;
 
   const DoctorPatientOverviewState({
     required this.patientId,
     required this.overview,
+    required this.program,
     required this.weekStartDate,
     required this.selectedDate,
   });
@@ -28,12 +22,14 @@ class DoctorPatientOverviewState {
   DoctorPatientOverviewState copyWith({
     String? patientId,
     DoctorPatientOverview? overview,
+    RehabilitationProgram? program,
     DateTime? weekStartDate,
     DateTime? selectedDate,
   }) {
     return DoctorPatientOverviewState(
       patientId: patientId ?? this.patientId,
       overview: overview ?? this.overview,
+      program: program ?? this.program,
       weekStartDate: weekStartDate ?? this.weekStartDate,
       selectedDate: selectedDate ?? this.selectedDate,
     );
@@ -57,25 +53,6 @@ class DoctorPatientOverviewState {
     return overview.hasPlan;
   }
 
-  bool get hasTodayWorkout {
-    return overview.hasTodayWorkout;
-  }
-
-  bool get hasWorkoutExercises {
-    final workout = overview.todayWorkout;
-    if (workout == null) return false;
-    if (workout.isRestDay) return false;
-
-    return workout.exercises.isNotEmpty;
-  }
-
-  int get workoutExercisesCount {
-    final workout = overview.todayWorkout;
-    if (workout == null) return 0;
-
-    return workout.exercises.length;
-  }
-
   int get progressPercent {
     return overview.progress?.completionPercent ?? 0;
   }
@@ -91,6 +68,67 @@ class DoctorPatientOverviewState {
     if (diff < 0) return 1;
 
     return diff ~/ 7 + 1;
+  }
+
+  int get totalWeeksCount {
+    final fullProgram = program;
+
+    if (fullProgram != null && fullProgram.days.isNotEmpty) {
+      final maxDayNumber = fullProgram.days
+          .map((day) => day.dayNumber)
+          .reduce((a, b) => a > b ? a : b);
+
+      if (maxDayNumber <= 0) return 1;
+
+      return (maxDayNumber / 7).ceil();
+    }
+
+    if (overview.days.isNotEmpty) {
+      final maxDayNumber = overview.days
+          .map((day) => day.dayNumber)
+          .reduce((a, b) => a > b ? a : b);
+
+      if (maxDayNumber <= 0) return 1;
+
+      return (maxDayNumber / 7).ceil();
+    }
+
+    return 1;
+  }
+
+  bool get canGoPreviousWeek {
+    return weekNumber > 1;
+  }
+
+  bool get canGoNextWeek {
+    return weekNumber < totalWeeksCount;
+  }
+
+  RehabilitationProgramDay? get selectedProgramDay {
+    final selectedOverviewDay = selectedDay;
+    final fullProgram = program;
+
+    if (selectedOverviewDay == null || fullProgram == null) return null;
+
+    for (final day in fullProgram.days) {
+      if (day.dayNumber == selectedOverviewDay.dayNumber) {
+        return day;
+      }
+    }
+
+    return null;
+  }
+
+  List<RehabilitationProgramExercise> get selectedProgramExercises {
+    return selectedProgramDay?.exercises ?? const [];
+  }
+
+  bool get selectedDayHasExercises {
+    return selectedProgramExercises.isNotEmpty;
+  }
+
+  int get selectedProgramExercisesCount {
+    return selectedProgramExercises.length;
   }
 
   static bool _isSameDate(DateTime a, DateTime b) {

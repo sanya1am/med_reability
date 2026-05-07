@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
+
+import '../../../../utils/assets/app_assets.dart';
 
 class PatientCard extends StatelessWidget {
   final String name;
   final String subtitle;
+  final bool hasPlan;
   final VoidCallback? onTap;
 
   const PatientCard({
     super.key,
     required this.name,
     required this.subtitle,
+    required this.hasPlan,
     this.onTap,
   });
 
@@ -65,6 +70,14 @@ class PatientCard extends StatelessWidget {
                 ],
               ),
             ),
+            if (!hasPlan) ...[
+              const SizedBox(width: 12),
+              SvgPicture.asset(
+                AppAssets.lampIcon,
+                width: 24,
+                height: 24,
+              ),
+            ],
           ],
         ),
       ),

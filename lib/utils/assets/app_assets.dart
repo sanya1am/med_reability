@@ -10,4 +10,5 @@ class AppAssets {
   static const uploadMediaIcon = 'assets/icons/upload_media.svg';
   static const lampIcon = 'assets/icons/lamp.svg';
   static const doctorsIcon = 'assets/icons/doctors_list.svg';
+  static const readyExerciseIcon = 'assets/icons/ready_exercise.svg';
 }

@@ -3,12 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:med_reability/features/doctor/presentation/view_model/doctor_patient_overview_view_model.dart';
 import 'package:med_reability/features/doctor/presentation/widgets/doctor_patient_overview_header.dart';
 import 'package:med_reability/features/doctor/presentation/widgets/patient_overview_empty_state.dart';
-import 'package:med_reability/features/doctor/presentation/widgets/patient_today_workout_list.dart';
+
 import 'package:med_reability/features/doctor/presentation/widgets/patient_week_card.dart';
 import 'package:med_reability/features/doctor/presentation/widgets/patient_week_progress_card.dart';
+import 'package:med_reability/features/rehabilitation_plan/presentation/page/rehabilitation_program_weeks_page.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/app_secondary_button.dart';
+import 'package:med_reability/utils/widgets/app_top_actions_bar.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
+
+import '../../../rehabilitation_plan/presentation/page/rehabilitation_program_edit_loader_page.dart';
+import '../widgets/patient_program_exercise_list.dart';
 
 class DoctorPatientOverviewPage extends ConsumerWidget {
   final String patientId;
@@ -61,8 +66,9 @@ class DoctorPatientOverviewPage extends ConsumerWidget {
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(28, 16, 28, 24),
                     children: [
-                      _BackButton(
-                        onTap: () => Navigator.of(context).pop(),
+                      AppTopActionsBar(
+                        onBack: () => Navigator.pop(context),
+                        onNotify: () {},
                       ),
 
                       const SizedBox(height: 26),
@@ -77,136 +83,106 @@ class DoctorPatientOverviewPage extends ConsumerWidget {
                         weekNumber: state.weekNumber,
                         days: state.days,
                         selectedDate: state.selectedDate,
+                        canGoPreviousWeek: state.canGoPreviousWeek,
+                        canGoNextWeek: state.canGoNextWeek,
                         onPreviousWeek: () {
-                          ref
-                              .read(
-                            doctorPatientOverviewViewModelProvider(
-                              patientId,
-                            ).notifier,
-                          )
-                              .previousWeek();
+                          ref.read(doctorPatientOverviewViewModelProvider(patientId).notifier).previousWeek();
                         },
                         onNextWeek: () {
-                          ref
-                              .read(
-                            doctorPatientOverviewViewModelProvider(
-                              patientId,
-                            ).notifier,
-                          )
-                              .nextWeek();
+                          ref.read(doctorPatientOverviewViewModelProvider(patientId).notifier).nextWeek();
                         },
                         onDayTap: (day) {
-                          ref
-                              .read(
-                            doctorPatientOverviewViewModelProvider(
-                              patientId,
-                            ).notifier,
-                          )
-                              .selectDay(day);
+                          ref.read(doctorPatientOverviewViewModelProvider(patientId).notifier).selectDay(day);
                         },
                       ),
 
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
 
                       PatientWeekProgressCard(
                         percent: state.progressPercent,
                       ),
 
-                      const SizedBox(height: 14),
+                      if (state.hasPlan) ...[
+                        const SizedBox(height: 16),
 
-                      SecondaryButton(
-                        text: 'Опросы по тренировкам',
-                        onPressed: () {
-                          // TODO: открыть экран опросов по тренировкам
-                        },
-                        height: 36,
-                        textStyle:
-                        Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontSize: 14,
+                        SecondaryButton(
+                            text: 'Оценка самочувствия',
+                            onPressed: () {
+                              // TODO: открыть экран опросов по тренировкам
+                            },
+                            height: 38,
+                            textStyle:
+                            Theme.of(context).textTheme.titleSmall
                         ),
-                      ),
+                      ],
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
 
                       _DateRow(
                         date: state.selectedDate,
-                        exercisesCount: state.hasWorkoutExercises
-                            ? state.workoutExercisesCount
+                        exercisesCount: state.selectedDayHasExercises
+                            ? state.selectedProgramExercisesCount
                             : null,
                       ),
 
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 24),
 
                       if (!state.hasPlan)
                         PatientOverviewEmptyState(
                           text: 'У пациента ещё нет плана по\nреабилитации.',
                           buttonText: 'Создать',
-                          onButtonPressed: () {
-                            // TODO: открыть создание плана реабилитации
+                          onButtonPressed: () async {
+                            final changed = await Navigator.of(context).push<bool>(
+                              MaterialPageRoute(
+                                builder: (_) => RehabilitationProgramWeeksPage(
+                                  patientId: patientId,
+                                ),
+                              ),
+                            );
+
+                            if (changed == true && context.mounted) {
+                              ref.read(doctorPatientOverviewViewModelProvider(patientId).notifier).refresh();
+                            }
                           },
                         )
-                      else if (!state.hasWorkoutExercises)
+                      else if (!state.selectedDayHasExercises)
                         PatientOverviewEmptyState(
                           text: 'На выбранный день тренировки нет.',
                           buttonText: 'Редактировать',
-                          onButtonPressed: () {
-                            // TODO: открыть редактирование плана
+                          onButtonPressed: () async {
+                            final changed = await Navigator.of(context).push<bool>(
+                              MaterialPageRoute(
+                                builder: (_) => RehabilitationProgramEditLoaderPage(
+                                  programId: overview.plan!.id,
+                                ),
+                              ),
+                            );
+
+                            if (changed == true && context.mounted) {
+                              ref.read(doctorPatientOverviewViewModelProvider(patientId).notifier).refresh();
+                            }
                           },
                         )
                       else ...[
-                          PatientTodayWorkoutList(
-                            exercises: overview.todayWorkout!.exercises,
-                          ),
-                          const SizedBox(height: 16),
-                          PrimaryButton(
-                            text: 'Редактировать',
-                            onPressed: () {
-                              // TODO: открыть редактирование плана
-                            },
-                            height: 38,
-                            textStyle: Theme.of(context).textTheme.titleSmall,
-                          ),
-                        ],
+                        PatientProgramExerciseList(
+                          exercises: state.selectedProgramExercises,
+                        ),
+                        const SizedBox(height: 20),
+                        PrimaryButton(
+                          text: 'Редактировать',
+                          onPressed: () {
+                            // редактирование плана
+                          },
+                          height: 38,
+                          textStyle: Theme.of(context).textTheme.titleSmall,
+                        ),
+                      ],
                     ],
                   ),
                 ),
               ],
             );
           },
-        ),
-      ),
-    );
-  }
-}
-
-class _BackButton extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _BackButton({
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: colors.iconButtonBackground,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.chevron_left,
-            size: 32,
-            color: colors.textPrimary,
-          ),
         ),
       ),
     );
@@ -232,17 +208,15 @@ class _DateRow extends StatelessWidget {
         Expanded(
           child: Text(
             dateText,
-            style: textTheme.titleSmall?.copyWith(
-              fontSize: 14,
-            ),
+            style: textTheme.titleSmall
           ),
         ),
         if (exercisesCount != null)
           Text(
             _formatExercisesCount(exercisesCount!),
-            style: textTheme.titleSmall?.copyWith(
-              fontSize: 14,
-            ),
+            style: textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            )
           ),
       ],
     );

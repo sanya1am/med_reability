@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/di/session_scope.dart';
 import '../../domain/entities/session.dart';
 import '../state/auth_ui_state.dart';
 import '../../domain/entities/clinic.dart';
@@ -43,14 +45,11 @@ class AuthViewModel extends Notifier<AuthUiState> {
         password: state.password,
         clinicId: state.selectedClinic!.id,
       );
-      final fixedSession = AuthSession(
-        token: session.token,
-        clinic: Clinic(id: session.clinic.id, name: state.selectedClinic!.name),
-        role: session.role,
-        userId: session.userId,
-      );
       state = state.copyWith(loading: false, session: session);
-    } catch (_) {
+      bumpSessionEpoch(ref);
+
+    } catch (e) {
+      debugPrint('LOGIN ERROR: $e');
       state = state.copyWith(loading: false, error: 'Ошибка входа');
     }
   }
