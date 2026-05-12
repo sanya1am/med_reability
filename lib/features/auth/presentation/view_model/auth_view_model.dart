@@ -46,6 +46,11 @@ class AuthViewModel extends Notifier<AuthUiState> {
         clinicId: state.selectedClinic!.id,
       );
       state = state.copyWith(loading: false, session: session);
+
+      await ref
+          .read(themeModeProvider.notifier)
+          .loadForUser(session.userId);
+
       bumpSessionEpoch(ref);
 
     } catch (e) {
@@ -56,6 +61,7 @@ class AuthViewModel extends Notifier<AuthUiState> {
 
   Future<void> logout() async {
     await _logout();
+    ref.read(themeModeProvider.notifier).resetToSystem();
     state = const AuthUiState.initial();
   }
 }

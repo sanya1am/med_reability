@@ -3,6 +3,7 @@ import 'doctor_patient_overview_patient.dart';
 import 'doctor_patient_overview_plan.dart';
 import 'doctor_patient_overview_progress.dart';
 import 'doctor_patient_overview_workout.dart';
+import 'doctor_patient_selected_day_progress.dart';
 
 class DoctorPatientOverview {
   final DoctorPatientOverviewPatient patient;
@@ -11,6 +12,7 @@ class DoctorPatientOverview {
   final DoctorPatientOverviewProgress? progress;
   final List<DoctorPatientOverviewDay> days;
   final DoctorPatientOverviewWorkout? todayWorkout;
+  final DoctorPatientSelectedDayProgress? selectedDayProgress;
 
   const DoctorPatientOverview({
     required this.patient,
@@ -19,6 +21,7 @@ class DoctorPatientOverview {
     required this.progress,
     required this.days,
     required this.todayWorkout,
+    required this.selectedDayProgress,
   });
 
   bool get hasTodayWorkout {

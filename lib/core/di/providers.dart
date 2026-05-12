@@ -42,6 +42,12 @@ import '../../features/doctor/domain/repositories/doctor_patient_overview_reposi
 import '../../features/doctor/domain/use_case/get_doctor_patient_overview_use_case.dart';
 import '../../features/exercises/domain/use_case/delete_exercise_use_case.dart';
 import '../../features/exercises/domain/use_case/get_exercise_filter_options_use_case.dart';
+import '../../features/patient/data/repositories/patient_program_repository_impl.dart';
+import '../../features/patient/domain/repositories/patient_program_repository.dart';
+import '../../features/patient/domain/use_case/complete_patient_exercise_use_case.dart';
+import '../../features/patient/domain/use_case/complete_patient_training_day_use_case.dart';
+import '../../features/patient/domain/use_case/get_patient_program_overview_use_case.dart';
+import '../../features/patient/domain/use_case/update_patient_day_progress_use_case.dart';
 import '../../features/profile/domain/use_case/change_my_password_use_case.dart';
 import '../../features/profile/domain/use_case/update_my_profile_use_case.dart';
 import '../../features/rehabilitation_plan/data/repositories/rehabilitation_program_repository_impl.dart';
@@ -50,7 +56,9 @@ import '../../features/rehabilitation_plan/domain/use_case/create_rehabilitation
 import '../../features/rehabilitation_plan/domain/use_case/delete_rehabilitation_program_use_case.dart';
 import '../../features/rehabilitation_plan/domain/use_case/get_rehabilitation_program_use_case.dart';
 import '../../features/rehabilitation_plan/domain/use_case/update_rehabilitation_program_use_case.dart';
+import '../services/theme_mode_storage.dart';
 import '../services/token_storage.dart';
+import '../theme/theme_mode_controller.dart';
 
 final baseUrlProvider = Provider<String>((_) {
   if (kIsWeb) return 'http://localhost:8080'; // web
@@ -66,10 +74,16 @@ final tokenStorageProvider = Provider<TokenStorage>((_) => TokenStorage());
 // app
 final appRouterProvider = Provider<GoRouter>((ref) => buildRouter(ref));
 
-final themeModeProvider = StateProvider<ThemeMode>(
-      // (_) => ThemeMode.light,
-      (_) => ThemeMode.system,
-);
+// theme
+final themeModeStorageProvider = Provider<ThemeModeStorage>((ref) {
+  return ThemeModeStorage();
+});
+final themeModeProvider =
+StateNotifierProvider<ThemeModeController, ThemeMode>((ref) {
+  return ThemeModeController(
+    ref.read(themeModeStorageProvider),
+  );
+});
 
 // repo
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -99,6 +113,9 @@ final doctorPatientOverviewRepositoryProvider = Provider<DoctorPatientOverviewRe
 final rehabilitationProgramRepositoryProvider = Provider<RehabilitationProgramRepository>((ref) {
   return RehabilitationProgramRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
 });
+final patientProgramRepositoryProvider = Provider<PatientProgramRepository>((ref) {
+  return PatientProgramRepositoryImpl(ref.read(dioProvider), ref.read(tokenStorageProvider));
+});
 
 // use cases
 final loginUseCaseProvider = Provider((ref) => LoginUseCase(ref.read(authRepositoryProvider)));
@@ -126,3 +143,7 @@ final createRehabilitationProgramUseCaseProvider = Provider((ref) => CreateRehab
 final updateRehabilitationProgramUseCaseProvider = Provider((ref) => UpdateRehabilitationProgramUseCase(ref.read(rehabilitationProgramRepositoryProvider)));
 final getRehabilitationProgramUseCaseProvider = Provider((ref) => GetRehabilitationProgramUseCase(ref.read(rehabilitationProgramRepositoryProvider)));
 final deleteRehabilitationProgramUseCaseProvider = Provider((ref) => DeleteRehabilitationProgramUseCase(ref.read(rehabilitationProgramRepositoryProvider)));
+final getPatientProgramOverviewUseCaseProvider = Provider((ref) => GetPatientProgramOverviewUseCase(ref.read(patientProgramRepositoryProvider)));
+final completePatientExerciseUseCaseProvider = Provider((ref) => CompletePatientExerciseUseCase(ref.read(patientProgramRepositoryProvider)));
+final completePatientTrainingDayUseCaseProvider = Provider((ref) => CompletePatientTrainingDayUseCase(ref.read(patientProgramRepositoryProvider)));
+final updatePatientDayProgressUseCaseProvider = Provider((ref) => UpdatePatientDayProgressUseCase(ref.read(patientProgramRepositoryProvider)));

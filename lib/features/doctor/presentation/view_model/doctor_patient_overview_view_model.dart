@@ -28,6 +28,7 @@ class DoctorPatientOverviewViewModel extends FamilyAsyncNotifier<DoctorPatientOv
         overview = await _getPatientOverview(
           patientId: patientId,
           startDate: weekStartDate,
+          workoutDate: weekStartDate,
         );
       }
 
@@ -57,6 +58,7 @@ class DoctorPatientOverviewViewModel extends FamilyAsyncNotifier<DoctorPatientOv
       final overview = await _getPatientOverview(
         patientId: _patientId,
         startDate: startDate,
+        workoutDate: current?.selectedDate,
       );
 
       final program = await _loadProgramIfExists(overview);
@@ -94,6 +96,7 @@ class DoctorPatientOverviewViewModel extends FamilyAsyncNotifier<DoctorPatientOv
       final overview = await _getPatientOverview(
         patientId: _patientId,
         startDate: normalizedWeekStartDate,
+        workoutDate: normalizedWeekStartDate, // ??
       );
 
       final program = current?.program ?? await _loadProgramIfExists(overview);
@@ -135,15 +138,37 @@ class DoctorPatientOverviewViewModel extends FamilyAsyncNotifier<DoctorPatientOv
     );
   }
 
-  void selectDay(DoctorPatientOverviewDay day) {
+  Future<void> selectDay(DoctorPatientOverviewDay day) async {
     final current = state.valueOrNull;
     if (current == null) return;
 
-    state = AsyncData(
-      current.copyWith(
-        selectedDate: _dateOnly(day.date),
-      ),
+    final selectedDate = _dateOnly(day.date);
+
+    final optimisticState = current.copyWith(
+      selectedDate: selectedDate,
     );
+
+    state = AsyncData(optimisticState);
+
+    final next = await AsyncValue.guard(() async {
+      final overview = await _getPatientOverview(
+        patientId: _patientId,
+        startDate: current.weekStartDate,
+        workoutDate: selectedDate,
+      );
+
+      return optimisticState.copyWith(
+        overview: overview,
+        program: current.program,
+      );
+    });
+
+    if (next.hasError && next.error is UnauthorizedException) {
+      await ref.read(authViewModelProvider.notifier).logout();
+      return;
+    }
+
+    state = next;
   }
 
   DateTime _resolveInitialWeekStartDate(DoctorPatientOverview overview) {

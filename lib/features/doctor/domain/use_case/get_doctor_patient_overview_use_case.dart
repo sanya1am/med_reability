@@ -9,10 +9,12 @@ class GetDoctorPatientOverviewUseCase {
   Future<DoctorPatientOverview> call({
     required String patientId,
     DateTime? startDate,
+    DateTime? workoutDate,
   }) {
     return _repo.getPatientOverview(
       patientId: patientId,
       startDate: startDate,
+      workoutDate: workoutDate,
     );
   }
 }

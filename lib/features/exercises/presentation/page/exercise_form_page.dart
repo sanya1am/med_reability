@@ -403,7 +403,7 @@ class _ExerciseTrackingTypeSelector extends StatelessWidget {
           ),
           Expanded(
             child: _TrackingTypeSegment(
-              text: 'Подходы',
+              text: 'Повторения',
               selected: value == ExerciseType.repetition,
               selectedBackground: selectedBackground,
               onTap: () => onChanged(ExerciseType.repetition),

@@ -6,6 +6,7 @@ import 'package:med_reability/features/doctor/presentation/widgets/patient_overv
 
 import 'package:med_reability/features/doctor/presentation/widgets/patient_week_card.dart';
 import 'package:med_reability/features/doctor/presentation/widgets/patient_week_progress_card.dart';
+import 'package:med_reability/features/rehabilitation_plan/presentation/page/day_well_being_view_page.dart';
 import 'package:med_reability/features/rehabilitation_plan/presentation/page/rehabilitation_program_weeks_page.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/app_secondary_button.dart';
@@ -106,13 +107,23 @@ class DoctorPatientOverviewPage extends ConsumerWidget {
                         const SizedBox(height: 16),
 
                         SecondaryButton(
-                            text: 'Оценка самочувствия',
-                            onPressed: () {
-                              // TODO: открыть экран опросов по тренировкам
-                            },
-                            height: 38,
-                            textStyle:
-                            Theme.of(context).textTheme.titleSmall
+                          text: 'Оценка самочувствия',
+                          onPressed: () {
+                            final progress = state.overview.selectedDayProgress;
+
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => DayWellBeingViewPage(
+                                  wellBeingRating: progress?.wellBeingRating,
+                                  workoutDifficultyRating: progress?.workoutDifficultyRating,
+                                  hadPain: progress?.hadPain,
+                                  painIntensityRating: progress?.painIntensityRating,
+                                ),
+                              ),
+                            );
+                          },
+                          height: 38,
+                          textStyle: Theme.of(context).textTheme.titleSmall,
                         ),
                       ],
 

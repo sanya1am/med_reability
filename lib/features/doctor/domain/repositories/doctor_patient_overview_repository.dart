@@ -4,5 +4,6 @@ abstract class DoctorPatientOverviewRepository {
   Future<DoctorPatientOverview> getPatientOverview({
     required String patientId,
     DateTime? startDate,
+    DateTime? workoutDate,
   });
 }
