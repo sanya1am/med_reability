@@ -4,6 +4,7 @@ import 'doctor_patient_overview_patient_dto.dart';
 import 'doctor_patient_overview_plan_dto.dart';
 import 'doctor_patient_overview_progress_dto.dart';
 import 'doctor_patient_overview_workout_dto.dart';
+import 'doctor_patient_selected_day_progress_dto.dart';
 
 class DoctorPatientOverviewDto {
   final DoctorPatientOverviewPatientDto patient;
@@ -12,6 +13,7 @@ class DoctorPatientOverviewDto {
   final DoctorPatientOverviewProgressDto? progress;
   final List<DoctorPatientOverviewDayDto> days;
   final DoctorPatientOverviewWorkoutDto? todayWorkout;
+  final DoctorPatientSelectedDayProgressDto? selectedDayProgress;
 
   const DoctorPatientOverviewDto({
     required this.patient,
@@ -20,6 +22,7 @@ class DoctorPatientOverviewDto {
     required this.progress,
     required this.days,
     required this.todayWorkout,
+    required this.selectedDayProgress,
   });
 
   factory DoctorPatientOverviewDto.fromJson(Map<String, dynamic> json) {
@@ -47,6 +50,11 @@ class DoctorPatientOverviewDto {
       todayWorkout: todayWorkoutRaw is Map<String, dynamic>
           ? DoctorPatientOverviewWorkoutDto.fromJson(todayWorkoutRaw)
           : null,
+      selectedDayProgress: json['selectedDayProgress'] is Map<String, dynamic>
+          ? DoctorPatientSelectedDayProgressDto.fromJson(
+        json['selectedDayProgress'] as Map<String, dynamic>,
+      )
+          : null,
     );
   }
 
@@ -58,6 +66,7 @@ class DoctorPatientOverviewDto {
       progress: progress?.toEntity(),
       days: days.map((x) => x.toEntity()).toList(),
       todayWorkout: todayWorkout?.toEntity(),
+      selectedDayProgress: selectedDayProgress?.toEntity(),
     );
   }
 }

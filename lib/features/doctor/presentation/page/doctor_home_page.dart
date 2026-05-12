@@ -6,6 +6,7 @@ import 'package:med_reability/features/profile/presentation/widgets/profile_avat
 import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/user_info_card.dart';
 
+import '../../../../utils/widgets/theme_switch_tile.dart';
 import '../../../profile/presentation/page/edit_profile_page.dart';
 
 class DoctorHomePage extends ConsumerWidget {
@@ -56,6 +57,10 @@ class DoctorHomePage extends ConsumerWidget {
                 onTap: () {},
               ),
             ),
+
+            const SizedBox(height: 16),
+
+            const ThemeSwitchTile(),
           ],
         );
       },

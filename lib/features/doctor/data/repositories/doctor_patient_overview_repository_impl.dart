@@ -34,17 +34,15 @@ class DoctorPatientOverviewRepositoryImpl
   Future<DoctorPatientOverview> getPatientOverview({
     required String patientId,
     DateTime? startDate,
+    DateTime? workoutDate,
   }) async {
     try {
-      final query = <String, dynamic>{};
-
-      if (startDate != null) {
-        query['startDate'] = _formatDate(startDate);
-      }
-
       final res = await _dio.get(
         '/api/doctors/me/patient-overview/$patientId',
-        queryParameters: query,
+        queryParameters: {
+          if (startDate != null) 'startDate': _formatDate(startDate),
+          if (workoutDate != null) 'workoutDate': _formatDate(workoutDate),
+        },
         options: await _authOptions(),
       );
 

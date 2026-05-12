@@ -1,8 +1,11 @@
+import 'package:med_reability/features/patient/domain/entities/patient_selected_day_progress.dart';
+
 import '../../../rehabilitation_plan/domain/entities/rehabilitation_program.dart';
 import '../../../rehabilitation_plan/domain/entities/rehabilitation_program_day.dart';
 import '../../../rehabilitation_plan/domain/entities/rehabilitation_program_exercise.dart';
 import '../../domain/entities/doctor_patient_overview.dart';
 import '../../domain/entities/doctor_patient_overview_day.dart';
+import '../../domain/entities/doctor_patient_selected_day_progress.dart';
 
 class DoctorPatientOverviewState {
   final String patientId;
@@ -129,6 +132,10 @@ class DoctorPatientOverviewState {
 
   int get selectedProgramExercisesCount {
     return selectedProgramExercises.length;
+  }
+
+  DoctorPatientSelectedDayProgress? get selectedDayProgress {
+    return overview.selectedDayProgress;
   }
 
   static bool _isSameDate(DateTime a, DateTime b) {
