@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:med_reability/core/router/doctor_routes.dart';
+import 'package:med_reability/core/router/patient_routes.dart';
 import 'package:med_reability/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:med_reability/features/doctor/presentation/page/doctor_main_page.dart';
 import 'package:med_reability/features/patient/presentation/page/patient_main_page.dart';
@@ -9,6 +11,7 @@ import '../../features/auth/presentation/page/login_page.dart';
 import '../../features/admin/presentation/page/admin_home_page.dart';
 import '../../features/doctor/presentation/page/doctor_home_page.dart';
 import '../../features/patient/presentation/page/patient_home_page.dart';
+import 'admin_routes.dart';
 import 'router_refresh.dart';
 
 GoRouter buildRouter(Ref ref) {
@@ -44,9 +47,16 @@ GoRouter buildRouter(Ref ref) {
     },
     routes: [
       GoRoute(path: '/login', builder: (_, __) => const LoginPage()),
-      GoRoute(path: '/admin', builder: (_, __) => const AdminHomePage()),
-      GoRoute(path: '/doctor', builder: (_, __) => const DoctorMainPage()),
-      GoRoute(path: '/patient', builder: (_, __) => const PatientMainPage()),
+
+      GoRoute(path: '/admin', redirect: (_, __) => '/admin/home'),
+      adminShellRoute,
+      adminCreateUserRoute,
+
+      GoRoute(path: '/doctor', redirect: (_, __) => '/doctor/home'),
+      doctorShellRoute,
+
+      GoRoute(path: '/patient', redirect: (_, __) => '/patient/home'),
+      patientShellRoute,
     ],
   );
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:med_reability/core/router/app_route_names.dart';
 import 'package:med_reability/features/doctor/presentation/widgets/patient_card.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
 import '../../../../utils/widgets/app_text_field.dart';
@@ -136,15 +138,21 @@ class _DoctorPatientsPageState extends ConsumerState<DoctorPatientsPage> {
                     subtitle: p.phoneNumber,
                     hasPlan: p.hasPlan,
                     onTap: () {
-                      debugPrint('OPEN PATIENT OVERVIEW: id=${p.patientId}, name=${p.fullName}');
+                      // debugPrint('OPEN PATIENT OVERVIEW: id=${p.patientId}, name=${p.fullName}');
 
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => DoctorPatientOverviewPage(
-                            patientId: p.patientId,
-                          ),
-                        ),
+                      context.pushNamed(
+                        AppRouteNames.doctorPatientOverview,
+                        pathParameters: {
+                          'patientId': p.patientId,
+                        },
                       );
+                      // Navigator.of(context).push(
+                      //   MaterialPageRoute(
+                      //     builder: (_) => DoctorPatientOverviewPage(
+                      //       patientId: p.patientId,
+                      //     ),
+                      //   ),
+                      // );
                     },
                   ),
                 ),

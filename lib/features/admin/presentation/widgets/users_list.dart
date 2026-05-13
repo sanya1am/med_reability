@@ -9,15 +9,17 @@ import 'package:med_reability/utils/theme/app_theme.dart';
 enum UsersTab { doctors, patients }
 
 class UsersList extends ConsumerWidget {
-  final List users;
+  final List<ClinicUser> users;
   final UsersState state;
   final UsersTab tab;
+  final EdgeInsetsGeometry padding;
 
   const UsersList({
     super.key,
     required this.users,
     required this.state,
     required this.tab,
+    this.padding = const EdgeInsets.fromLTRB(28, 16, 28, 120),
   });
 
   @override
@@ -36,16 +38,17 @@ class UsersList extends ConsumerWidget {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(28, 16, 28, 120),
+      padding: padding,
       itemCount: users.length,
       separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (_, i) {
-        final u = users[i] as ClinicUser;
+        final u = users[i];
 
         final assignment = state.doctorByPatientId[u.id];
         final patientsCount = state.patientsCountByDoctorId[u.id] ?? 0;
 
         String subtitle = u.email;
+
         if (tab == UsersTab.patients) {
           subtitle = assignment == null
               ? 'Инструктор: не назначен'

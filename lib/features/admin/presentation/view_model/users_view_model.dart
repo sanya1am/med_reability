@@ -3,6 +3,7 @@ import 'package:med_reability/features/admin/presentation/state/users_state.dart
 import 'package:med_reability/features/auth/domain/entities/role.dart';
 import 'package:med_reability/features/auth/presentation/view_model/auth_view_model.dart';
 import '../../../../core/di/providers.dart';
+import '../../../../core/di/session_scope.dart';
 import '../../../../core/errors/unauthorized_exception.dart';
 
 
@@ -17,6 +18,8 @@ class UsersViewModel extends AsyncNotifier<UsersState> {
 
   @override
   Future<UsersState> build() async {
+    ref.watch(sessionEpochProvider);
+
     try {
       return _load(pageNumber: 1, pageSize: 50);
     } on UnauthorizedException {

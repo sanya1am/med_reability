@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/di/providers.dart';
@@ -145,7 +146,10 @@ class ExerciseFormViewModel extends StateNotifier<ExerciseFormState> {
       );
       await ref.read(authViewModelProvider.notifier).logout();
       return const ExerciseFormSubmitResult.failure('Сессия истекла');
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('Неизвестная ошибка сохранения упражнения: $e');
+      debugPrintStack(stackTrace: st);
+
       final message = 'Не удалось сохранить упражнение: $e';
 
       state = state.copyWith(
