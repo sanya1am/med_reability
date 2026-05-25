@@ -9,10 +9,14 @@ import 'package:med_reability/features/rehabilitation_plan/presentation/state/re
 import 'package:med_reability/utils/theme/app_theme.dart';
 
 import '../../../../utils/widgets/app_top_actions_bar.dart';
+import '../widgets/rehabilitation_plan_page_layout.dart';
 
 class RehabilitationExercisePickerPage extends ConsumerStatefulWidget {
+  final List<String> breadcrumbLabels;
+
   const RehabilitationExercisePickerPage({
     super.key,
+    this.breadcrumbLabels = const [],
   });
 
   @override
@@ -49,12 +53,35 @@ class _RehabilitationExercisePickerPageState
             ),
           ),
           data: (state) {
+            final isDesktop = isRehabilitationPlanDesktopLayout(context);
+
+            final labels = widget.breadcrumbLabels.isNotEmpty
+                ? widget.breadcrumbLabels
+                : const [
+              'Редактирование плана',
+              'Добавить упражнение',
+            ];
+
             return Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                  child: AppTopActionsBar(onBack: () => Navigator.pop(context), onNotify: () {}),
+                  padding: EdgeInsets.fromLTRB(
+                    isDesktop ? 28 : 20,
+                    isDesktop ? 20 : 12,
+                    isDesktop ? 28 : 20,
+                    0,
+                  ),
+                  child: RehabilitationPlanAdaptiveHeader(
+                    breadcrumbs: rehabilitationPlanBreadcrumbs(
+                      context,
+                      labels,
+                    ),
+                    onBack: () => Navigator.pop(context),
+                  ),
                 ),
+
+                SizedBox(height: isDesktop ? 24 : 18),
+
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: () {
@@ -75,6 +102,10 @@ class _RehabilitationExercisePickerPageState
                           MaterialPageRoute(
                             builder: (_) => RehabilitationExerciseDetailsPage(
                               exercise: exercise,
+                              breadcrumbLabels: [
+                                ...labels,
+                                exercise.name,
+                              ],
                             ),
                           ),
                         );

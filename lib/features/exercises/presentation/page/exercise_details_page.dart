@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/app_secondary_button.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
+import '../../../../core/router/app_route_names.dart';
+import '../../../../utils/widgets/app_breadcrumbs.dart';
 import '../../domain/entities/exercise.dart';
 import '../view_model/exercises_view_model.dart';
 import '../../../../utils/widgets/app_top_actions_bar.dart';
@@ -119,60 +122,128 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colors = context.appColors;
 
-    return Scaffold(
-      body: SafeArea(
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : errorText != null
-            ? Center(
-          child: Text(
-            errorText!,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colors.textPrimary,
+    if (isLoading) {
+      return const Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
+    if (errorText != null || exercise == null) {
+      return Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
+            child: Column(
+              children: [
+                AppTopActionsBar(
+                  onBack: () => Navigator.pop(context),
+                ),
+                const SizedBox(height: 40),
+                Text(
+                  errorText ?? 'Не удалось загрузить упражнение',
+                  textAlign: TextAlign.center,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colors.textPrimary,
+                  ),
+                ),
+              ],
             ),
           ),
-        )
-            : RefreshIndicator(
-          onRefresh: _load,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(28, 12, 28, 24),
-            children: [
-              AppTopActionsBar(
-                onBack: () => Navigator.pop(context),
-                onNotify: () {},
-              ),
-              const SizedBox(height: 16),
+        ),
+      );
+    }
 
-              ExerciseDetailsContent(
-                exercise: exercise!,
-                bottomActions: Row(
-                  children: [
-                    Expanded(
-                      child: SecondaryButton(
-                        text: 'Удалить',
-                        onPressed: _deleteExercise,
-                        height: 38,
-                        textStyle: textTheme.titleSmall,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: PrimaryButton(
-                        text: 'Редактировать',
-                        onPressed: _openEdit,
-                        height: 38,
-                        textStyle: textTheme.titleSmall,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+    final currentExercise = exercise!;
+
+    Widget bottomActions() {
+      return Row(
+        children: [
+          Expanded(
+            child: SecondaryButton(
+              text: 'Удалить',
+              onPressed: _deleteExercise,
+              height: 38,
+              textStyle: textTheme.titleSmall,
+            ),
           ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: PrimaryButton(
+              text: 'Редактировать',
+              onPressed: _openEdit,
+              height: 38,
+              textStyle: textTheme.titleSmall,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Scaffold(
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isDesktop = constraints.maxWidth >= 900;
+
+            if (isDesktop) {
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(28, 20, 28, 32),
+                children: [
+                  AppBreadcrumbs(
+                    onBack: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.goNamed(AppRouteNames.doctorExercises);
+                      }
+                    },
+                    items: [
+                      AppBreadcrumbItem(
+                        label: 'Упражнения',
+                        onTap: () {
+                          context.goNamed(AppRouteNames.doctorExercises);
+                        },
+                      ),
+                      AppBreadcrumbItem(
+                        label: currentExercise.name,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 22),
+
+                  ExerciseDetailsContent(
+                    exercise: currentExercise,
+                    isDesktopLayout: true,
+                    bottomActions: bottomActions(),
+                  ),
+                ],
+              );
+            }
+
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
+              children: [
+                AppTopActionsBar(
+                  onBack: () => Navigator.pop(context),
+                ),
+                const SizedBox(height: 16),
+                ExerciseDetailsContent(
+                  exercise: currentExercise,
+                  bottomActions: bottomActions(),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

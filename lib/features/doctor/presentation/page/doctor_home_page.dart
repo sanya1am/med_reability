@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:med_reability/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:med_reability/features/auth/presentation/view_model/user_me_view_model.dart';
 import 'package:med_reability/features/profile/presentation/widgets/profile_avatar_picker.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/user_info_card.dart';
 
+import '../../../../core/router/app_route_names.dart';
 import '../../../../utils/widgets/theme_switch_tile.dart';
 import '../../../profile/presentation/page/edit_profile_page.dart';
 
@@ -41,10 +43,8 @@ class DoctorHomePage extends ConsumerWidget {
               onActionPressed: () =>
                   ref.read(authViewModelProvider.notifier).logout(),
               onEditPressed: () async {
-                final changed = await Navigator.of(context).push<bool>(
-                  MaterialPageRoute(
-                    builder: (_) => const EditProfilePage(),
-                  ),
+                final changed = await context.pushNamed<bool>(
+                  AppRouteNames.doctorEditProfile,
                 );
 
                 if (changed == true) {

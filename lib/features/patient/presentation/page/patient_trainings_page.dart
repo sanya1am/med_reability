@@ -114,7 +114,7 @@ class PatientTrainingsPage extends ConsumerWidget {
                   PatientTrainingExerciseList(
                     exercises: state.workout!.exercises,
                   ),
-                  const SizedBox(height: 16),
+                  // const SizedBox(height: 16),
 
                   if (state.canStartWorkout) ...[
                     const SizedBox(height: 16),

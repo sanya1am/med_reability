@@ -15,6 +15,7 @@ class RehabilitationEmptyDayState extends StatelessWidget {
     final colors = context.appColors;
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           Icons.info_outline,
@@ -29,9 +30,9 @@ class RehabilitationEmptyDayState extends StatelessWidget {
             color: colors.textPrimary,
           ),
         ),
-        const SizedBox(height: 22),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 26),
+        const SizedBox(height: 18),
+        SizedBox(
+          width: 250,
           child: PrimaryButton(
             text: 'Добавить упражнение',
             onPressed: onAddExercise,

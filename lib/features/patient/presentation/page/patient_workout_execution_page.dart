@@ -174,7 +174,6 @@ class _PatientWorkoutExecutionPageState
           children: [
             AppTopActionsBar(
               onBack: _goBack,
-              onNotify: () {},
             ),
 
             const SizedBox(height: 20),

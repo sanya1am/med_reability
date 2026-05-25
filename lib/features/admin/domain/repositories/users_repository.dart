@@ -1,5 +1,6 @@
 import '../../../auth/domain/entities/role.dart';
 import '../entities/clinic_user.dart';
+import '../entities/user_image_file.dart';
 
 class PagedResult<T> {
   final int pageNumber;
@@ -29,6 +30,17 @@ abstract class UsersRepository {
     required String lastName,
     required String phoneNumber,
     required UserRole role,
+    UserImageFile? image,
+  });
+
+  Future<void> updateUser({
+    required String id,
+    required String email,
+    required String firstName,
+    required String patronymic,
+    required String lastName,
+    required String phoneNumber,
+    UserImageFile? image,
   });
 
   Future<void> deactivateUser({required String userId});

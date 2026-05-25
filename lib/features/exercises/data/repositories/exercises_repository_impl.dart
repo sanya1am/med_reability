@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../../../core/errors/unauthorized_exception.dart';
 import '../../../../core/services/token_storage.dart';
 import '../../domain/entities/exercise.dart';
@@ -143,7 +144,11 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
       if (code == 401) throw const UnauthorizedException();
       if (code == 403) throw Exception('Недостаточно прав');
       if (code == 400) throw Exception('Некорректные данные упражнения');
-      throw Exception('Не удалось создать упражнение');
+      throw Exception(
+        'Не удалось обновить упражнение'
+            'Status: ${e.response?.statusCode}. '
+            'Data: ${e.response?.data ?? e.message}',
+      );
     }
   }
 
@@ -196,7 +201,7 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
       );
 
       return ExerciseDto.fromJson(res.data as Map<String, dynamic>).toEntity();
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
       final code = e.response?.statusCode;
       if (code == 401) throw const UnauthorizedException();
       if (code == 403) throw Exception('Недостаточно прав');
@@ -207,7 +212,28 @@ class ExercisesRepositoryImpl implements ExercisesRepository {
             : null;
         throw Exception(detail ?? 'Некорректные данные упражнения');
       }
-      throw Exception('Не удалось обновить упражнение');
+
+      debugPrint('Dio ошибка обновления упражнения');
+      debugPrint('Dio type: ${e.type}');
+      debugPrint('Dio message: ${e.message}');
+      debugPrint('Dio error: ${e.error}');
+      debugPrint('Status code: ${e.response?.statusCode}');
+      debugPrint('Response data: ${e.response?.data}');
+      debugPrint('Request method: ${e.requestOptions.method}');
+      debugPrint('Request path: ${e.requestOptions.path}');
+      debugPrint('Request baseUrl: ${e.requestOptions.baseUrl}');
+      debugPrint('Request contentType: ${e.requestOptions.contentType}');
+      debugPrint('Request headers: ${e.requestOptions.headers}');
+      debugPrintStack(stackTrace: st);
+
+      throw Exception(
+        'Не удалось обновить упражнение. '
+            'DioType: ${e.type}. '
+            'Message: ${e.message}. '
+            'Error: ${e.error}. '
+            'Status: ${e.response?.statusCode}. '
+            'Data: ${e.response?.data}',
+      );
     }
   }
 

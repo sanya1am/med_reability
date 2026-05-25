@@ -6,6 +6,7 @@ class DoctorPatient {
   final String lastName;
   final String email;
   final String phoneNumber;
+  final String? imageUrl;
   final bool isActive;
   final bool hasPlan;
 
@@ -17,6 +18,7 @@ class DoctorPatient {
     required this.lastName,
     required this.email,
     required this.phoneNumber,
+    required this.imageUrl,
     required this.isActive,
     required this.hasPlan,
   });

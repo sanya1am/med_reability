@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:med_reability/core/router/app_route_names.dart';
 import 'package:med_reability/features/auth/presentation/view_model/user_me_view_model.dart';
 import 'package:med_reability/features/exercises/domain/entities/exercise.dart';
 import 'package:med_reability/features/exercises/domain/entities/exercise_type.dart';
@@ -65,13 +67,20 @@ class _ExercisesPageState extends ConsumerState<ExercisesPage> {
             currentUserId: me?.userId,
             actionText: 'Подробнее',
             onAction: (exercise) async {
-              final changed = await Navigator.of(context).push<bool>(
-                MaterialPageRoute(
-                  builder: (_) => ExerciseDetailsPage(
-                    exerciseId: exercise.id,
-                  ),
-                ),
+              final changed = await
+              context.pushNamed(
+                AppRouteNames.doctorExerciseDetails,
+                pathParameters: {
+                  'exerciseId': exercise.id,
+                },
               );
+              // Navigator.of(context).push<bool>(
+              //   MaterialPageRoute(
+              //     builder: (_) => ExerciseDetailsPage(
+              //       exerciseId: exercise.id,
+              //     ),
+              //   ),
+              // );
 
               if (changed == true) {
                 await ref

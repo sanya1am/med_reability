@@ -104,14 +104,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Укажите поликлинику',
+                    'Укажите клинику',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
                 const SizedBox(height: 12),
 
                 AppTextField(
-                  hintText: 'Поликлиника',
+                  hintText: 'Клиника',
                   controller: _clinicController,
                   readOnly: true,
                   onTap: () => _pickClinic(context),

@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:med_reability/features/patient/presentation/page/patient_home_page.dart';
-import 'package:med_reability/features/patient/presentation/page/patient_trainings_page.dart';
+import 'package:med_reability/features/exercises/presentation/page/exercises_page.dart';
 import 'package:med_reability/utils/assets/app_assets.dart';
-import 'package:med_reability/utils/widgets/app_bottom_nav.dart';
-import 'package:med_reability/utils/widgets/app_header.dart';
+import '../../../../utils/widgets/app_bottom_nav.dart';
+import '../../../../utils/widgets/app_header.dart';
+import 'doctor_home_page.dart';
+import 'doctor_patients_page.dart';
 
-class PatientMainPage extends StatefulWidget {
-  const PatientMainPage({super.key});
+class DoctorMobileMainPage extends ConsumerStatefulWidget {
+  const DoctorMobileMainPage({super.key});
 
   @override
-  State<PatientMainPage> createState() => _PatientMainPageState();
+  ConsumerState<DoctorMobileMainPage> createState() => _DoctorMobileMainPageState();
 }
 
-class _PatientMainPageState extends State<PatientMainPage> {
-  int _index = 1;
+class _DoctorMobileMainPageState extends ConsumerState<DoctorMobileMainPage> {
+  int _index = 2;
 
   void _onNav(int i) {
     if (_index == i) return;
@@ -24,7 +26,8 @@ class _PatientMainPageState extends State<PatientMainPage> {
   @override
   Widget build(BuildContext context) {
     final title = switch (_index) {
-      0 => 'Тренировки',
+      0 => 'Пациенты',
+      1 => 'Упражнения',
       _ => 'Главная',
     };
 
@@ -35,17 +38,16 @@ class _PatientMainPageState extends State<PatientMainPage> {
             children: [
               AppHeader(
                 title: title,
-                actionIconWidget: SvgPicture.asset(
-                  AppAssets.notificationsIcon,
-                ),
-                onAction: () {},
+                // actionIconWidget: SvgPicture.asset(AppAssets.notificationsIcon),
+                // onAction: () {},
               ),
               Expanded(
                 child: IndexedStack(
                   index: _index,
                   children: const [
-                    PatientTrainingsPage(),
-                    PatientHomePage(),
+                    DoctorPatientsPage(),
+                    ExercisesPage(),
+                    DoctorHomePage(),
                   ],
                 ),
               ),
@@ -62,12 +64,9 @@ class _PatientMainPageState extends State<PatientMainPage> {
                   index: _index,
                   onTap: _onNav,
                   items: [
-                    BottomNavItem(
-                      icon: SvgPicture.asset(AppAssets.heartIcon),
-                    ),
-                    BottomNavItem(
-                      icon: SvgPicture.asset(AppAssets.homeIcon),
-                    ),
+                    BottomNavItem(icon: SvgPicture.asset(AppAssets.listIcon)),
+                    BottomNavItem(icon: SvgPicture.asset(AppAssets.heartIcon)),
+                    BottomNavItem(icon: SvgPicture.asset(AppAssets.homeIcon)),
                   ],
                 ),
               ),

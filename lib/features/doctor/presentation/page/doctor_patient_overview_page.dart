@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:med_reability/core/router/app_route_names.dart';
 import 'package:med_reability/features/doctor/presentation/view_model/doctor_patient_overview_view_model.dart';
 import 'package:med_reability/features/doctor/presentation/widgets/doctor_patient_overview_header.dart';
 import 'package:med_reability/features/doctor/presentation/widgets/patient_overview_empty_state.dart';
-
+import 'package:med_reability/features/doctor/presentation/widgets/patient_program_exercise_list.dart';
 import 'package:med_reability/features/doctor/presentation/widgets/patient_week_card.dart';
 import 'package:med_reability/features/doctor/presentation/widgets/patient_week_progress_card.dart';
+import 'package:med_reability/features/rehabilitation_plan/domain/entities/rehabilitation_program_exercise.dart';
 import 'package:med_reability/features/rehabilitation_plan/presentation/page/day_well_being_view_page.dart';
+import 'package:med_reability/features/rehabilitation_plan/presentation/page/rehabilitation_program_edit_loader_page.dart';
 import 'package:med_reability/features/rehabilitation_plan/presentation/page/rehabilitation_program_weeks_page.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
+import 'package:med_reability/utils/widgets/app_breadcrumbs.dart';
 import 'package:med_reability/utils/widgets/app_secondary_button.dart';
 import 'package:med_reability/utils/widgets/app_top_actions_bar.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
-
-import '../../../rehabilitation_plan/presentation/page/rehabilitation_program_edit_loader_page.dart';
-import '../widgets/patient_program_exercise_list.dart';
 
 class DoctorPatientOverviewPage extends ConsumerWidget {
   final String patientId;
@@ -53,9 +55,12 @@ class DoctorPatientOverviewPage extends ConsumerWidget {
           data: (state) {
             final overview = state.overview;
 
-            return Stack(
-              children: [
-                RefreshIndicator(
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final isDesktop = constraints.maxWidth >= 900;
+                final patientTitle = overview.patient.fullName;
+
+                return RefreshIndicator(
                   onRefresh: () {
                     return ref
                         .read(
@@ -65,69 +70,186 @@ class DoctorPatientOverviewPage extends ConsumerWidget {
                         .refresh();
                   },
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(28, 16, 28, 24),
+                    padding: EdgeInsets.fromLTRB(
+                      isDesktop ? 28 : 14,
+                      isDesktop ? 20 : 12,
+                      isDesktop ? 28 : 14,
+                      24,
+                    ),
                     children: [
-                      AppTopActionsBar(
-                        onBack: () => Navigator.pop(context),
-                        onNotify: () {},
-                      ),
+                      if (isDesktop) ...[
+                        AppBreadcrumbs(
+                          onBack: () {
+                            if (context.canPop()) {
+                              context.pop();
+                            } else {
+                              context.goNamed(AppRouteNames.doctorPatients);
+                            }
+                          },
+                          items: [
+                            AppBreadcrumbItem(
+                              label: 'Пациенты',
+                              onTap: () {
+                                context.goNamed(AppRouteNames.doctorPatients);
+                              },
+                            ),
+                            AppBreadcrumbItem(
+                              label: patientTitle,
+                            ),
+                          ],
+                        ),
 
-                      const SizedBox(height: 26),
+                        const SizedBox(height: 26),
 
-                      DoctorPatientOverviewHeader(
-                        patient: overview.patient,
-                      ),
+                        _DesktopPatientOverviewTopSection(
+                          patientHeader: DoctorPatientOverviewHeader(
+                            patient: overview.patient,
+                          ),
+                          weekCard: PatientWeekCard(
+                            weekNumber: state.weekNumber,
+                            days: state.days,
+                            selectedDate: state.selectedDate,
+                            canGoPreviousWeek: state.canGoPreviousWeek,
+                            canGoNextWeek: state.canGoNextWeek,
+                            onPreviousWeek: () {
+                              ref
+                                  .read(
+                                doctorPatientOverviewViewModelProvider(
+                                  patientId,
+                                ).notifier,
+                              )
+                                  .previousWeek();
+                            },
+                            onNextWeek: () {
+                              ref
+                                  .read(
+                                doctorPatientOverviewViewModelProvider(
+                                  patientId,
+                                ).notifier,
+                              )
+                                  .nextWeek();
+                            },
+                            onDayTap: (day) {
+                              ref
+                                  .read(
+                                doctorPatientOverviewViewModelProvider(
+                                  patientId,
+                                ).notifier,
+                              )
+                                  .selectDay(day);
+                            },
+                          ),
+                          progressCard: PatientWeekProgressCard(
+                            percent: state.progressPercent,
+                          ),
+                          wellBeingButton: SecondaryButton(
+                            text: 'Оценка самочувствия',
+                            onPressed: () {
+                              final progress = state.overview.selectedDayProgress;
 
-                      const SizedBox(height: 28),
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => DayWellBeingViewPage(
+                                    wellBeingRating: progress?.wellBeingRating,
+                                    workoutDifficultyRating: progress?.workoutDifficultyRating,
+                                    hadPain: progress?.hadPain,
+                                    painIntensityRating: progress?.painIntensityRating,
+                                    breadcrumbLabels: [
+                                      overview.patient.fullName,
+                                      'Оценка самочувствия',
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            height: 38,
+                            textStyle: Theme.of(context).textTheme.titleSmall,
+                          ),
+                        ),
 
-                      PatientWeekCard(
-                        weekNumber: state.weekNumber,
-                        days: state.days,
-                        selectedDate: state.selectedDate,
-                        canGoPreviousWeek: state.canGoPreviousWeek,
-                        canGoNextWeek: state.canGoNextWeek,
-                        onPreviousWeek: () {
-                          ref.read(doctorPatientOverviewViewModelProvider(patientId).notifier).previousWeek();
-                        },
-                        onNextWeek: () {
-                          ref.read(doctorPatientOverviewViewModelProvider(patientId).notifier).nextWeek();
-                        },
-                        onDayTap: (day) {
-                          ref.read(doctorPatientOverviewViewModelProvider(patientId).notifier).selectDay(day);
-                        },
-                      ),
+                        const SizedBox(height: 24),
+                      ] else ...[
+                        AppTopActionsBar(
+                          onBack: () => Navigator.pop(context),
+                        ),
 
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 26),
 
-                      PatientWeekProgressCard(
-                        percent: state.progressPercent,
-                      ),
+                        DoctorPatientOverviewHeader(
+                          patient: overview.patient,
+                        ),
 
-                      if (state.hasPlan) ...[
+                        const SizedBox(height: 28),
+
+                        PatientWeekCard(
+                          weekNumber: state.weekNumber,
+                          days: state.days,
+                          selectedDate: state.selectedDate,
+                          canGoPreviousWeek: state.canGoPreviousWeek,
+                          canGoNextWeek: state.canGoNextWeek,
+                          onPreviousWeek: () {
+                            ref
+                                .read(
+                              doctorPatientOverviewViewModelProvider(
+                                patientId,
+                              ).notifier,
+                            )
+                                .previousWeek();
+                          },
+                          onNextWeek: () {
+                            ref
+                                .read(
+                              doctorPatientOverviewViewModelProvider(
+                                patientId,
+                              ).notifier,
+                            )
+                                .nextWeek();
+                          },
+                          onDayTap: (day) {
+                            ref
+                                .read(
+                              doctorPatientOverviewViewModelProvider(
+                                patientId,
+                              ).notifier,
+                            )
+                                .selectDay(day);
+                          },
+                        ),
+
                         const SizedBox(height: 16),
 
-                        SecondaryButton(
-                          text: 'Оценка самочувствия',
-                          onPressed: () {
-                            final progress = state.overview.selectedDayProgress;
-
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => DayWellBeingViewPage(
-                                  wellBeingRating: progress?.wellBeingRating,
-                                  workoutDifficultyRating: progress?.workoutDifficultyRating,
-                                  hadPain: progress?.hadPain,
-                                  painIntensityRating: progress?.painIntensityRating,
-                                ),
-                              ),
-                            );
-                          },
-                          height: 38,
-                          textStyle: Theme.of(context).textTheme.titleSmall,
+                        PatientWeekProgressCard(
+                          percent: state.progressPercent,
                         ),
-                      ],
 
-                      const SizedBox(height: 24),
+                        if (state.hasPlan) ...[
+                          const SizedBox(height: 16),
+                          SecondaryButton(
+                            text: 'Оценка самочувствия',
+                            onPressed: () {
+                              final progress =
+                                  state.overview.selectedDayProgress;
+
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => DayWellBeingViewPage(
+                                    wellBeingRating: progress?.wellBeingRating,
+                                    workoutDifficultyRating:
+                                    progress?.workoutDifficultyRating,
+                                    hadPain: progress?.hadPain,
+                                    painIntensityRating:
+                                    progress?.painIntensityRating,
+                                  ),
+                                ),
+                              );
+                            },
+                            height: 38,
+                            textStyle: Theme.of(context).textTheme.titleSmall,
+                          ),
+                        ],
+
+                        const SizedBox(height: 24),
+                      ],
 
                       _DateRow(
                         date: state.selectedDate,
@@ -138,64 +260,212 @@ class DoctorPatientOverviewPage extends ConsumerWidget {
 
                       const SizedBox(height: 24),
 
-                      if (!state.hasPlan)
-                        PatientOverviewEmptyState(
-                          text: 'У пациента ещё нет плана по\nреабилитации.',
-                          buttonText: 'Создать',
-                          onButtonPressed: () async {
-                            final changed = await Navigator.of(context).push<bool>(
-                              MaterialPageRoute(
-                                builder: (_) => RehabilitationProgramWeeksPage(
-                                  patientId: patientId,
-                                ),
+                      _PatientOverviewContent(
+                        isDesktop: isDesktop,
+                        hasPlan: state.hasPlan,
+                        selectedDayHasExercises: state.selectedDayHasExercises,
+                        selectedProgramExercises: state.selectedProgramExercises,
+                        onCreatePlan: () async {
+                          final changed =
+                          await Navigator.of(context).push<bool>(
+                            MaterialPageRoute(
+                              builder: (_) => RehabilitationProgramWeeksPage(
+                                patientId: patientId,
                               ),
-                            );
+                            ),
+                          );
 
-                            if (changed == true && context.mounted) {
-                              ref.read(doctorPatientOverviewViewModelProvider(patientId).notifier).refresh();
-                            }
-                          },
-                        )
-                      else if (!state.selectedDayHasExercises)
-                        PatientOverviewEmptyState(
-                          text: 'На выбранный день тренировки нет.',
-                          buttonText: 'Редактировать',
-                          onButtonPressed: () async {
-                            final changed = await Navigator.of(context).push<bool>(
-                              MaterialPageRoute(
-                                builder: (_) => RehabilitationProgramEditLoaderPage(
-                                  programId: overview.plan!.id,
-                                ),
-                              ),
-                            );
+                          if (changed == true && context.mounted) {
+                            ref
+                                .read(
+                              doctorPatientOverviewViewModelProvider(
+                                patientId,
+                              ).notifier,
+                            )
+                                .refresh();
+                          }
+                        },
+                        onEditPlan: () async {
+                          final plan = overview.plan;
+                          if (plan == null) return;
 
-                            if (changed == true && context.mounted) {
-                              ref.read(doctorPatientOverviewViewModelProvider(patientId).notifier).refresh();
-                            }
-                          },
-                        )
-                      else ...[
-                        PatientProgramExerciseList(
-                          exercises: state.selectedProgramExercises,
-                        ),
-                        const SizedBox(height: 20),
-                        PrimaryButton(
-                          text: 'Редактировать',
-                          onPressed: () {
-                            // редактирование плана
-                          },
-                          height: 38,
-                          textStyle: Theme.of(context).textTheme.titleSmall,
-                        ),
-                      ],
+                          final changed =
+                          await Navigator.of(context).push<bool>(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  RehabilitationProgramEditLoaderPage(
+                                    programId: plan.id,
+                                  ),
+                            ),
+                          );
+
+                          if (changed == true && context.mounted) {
+                            ref
+                                .read(
+                              doctorPatientOverviewViewModelProvider(
+                                patientId,
+                              ).notifier,
+                            )
+                                .refresh();
+                          }
+                        },
+                      ),
                     ],
                   ),
-                ),
-              ],
+                );
+              },
             );
           },
         ),
       ),
+    );
+  }
+}
+
+class _DesktopPatientOverviewTopSection extends StatelessWidget {
+  final Widget patientHeader;
+  final Widget weekCard;
+  final Widget progressCard;
+  final Widget? wellBeingButton;
+
+  const _DesktopPatientOverviewTopSection({
+    required this.patientHeader,
+    required this.weekCard,
+    required this.progressCard,
+    this.wellBeingButton,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: _DesktopPatientHeaderCard(
+            child: patientHeader,
+          ),
+        ),
+
+        const SizedBox(width: 16),
+
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              weekCard,
+
+              const SizedBox(height: 16),
+
+              progressCard,
+
+              if (wellBeingButton != null) ...[
+                const SizedBox(height: 16),
+                wellBeingButton!,
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DesktopPatientHeaderCard extends StatelessWidget {
+  final Widget child;
+
+  const _DesktopPatientHeaderCard({
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Container(
+      height: 288,
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(32, 28, 32, 28),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _PatientOverviewContent extends StatelessWidget {
+  final bool isDesktop;
+  final bool hasPlan;
+  final bool selectedDayHasExercises;
+  final List<RehabilitationProgramExercise> selectedProgramExercises;
+  final VoidCallback onCreatePlan;
+  final VoidCallback onEditPlan;
+
+  const _PatientOverviewContent({
+    required this.isDesktop,
+    required this.hasPlan,
+    required this.selectedDayHasExercises,
+    required this.selectedProgramExercises,
+    required this.onCreatePlan,
+    required this.onEditPlan,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (!hasPlan) {
+      return Padding(
+        padding: EdgeInsets.only(
+          top: isDesktop ? 96 : 0,
+        ),
+        child: Center(
+          child: SizedBox(
+            width: isDesktop ? 270 : double.infinity,
+            child: PatientOverviewEmptyState(
+              text: 'У пациента ещё нет плана по\nреабилитации.',
+              buttonText: 'Создать',
+              onButtonPressed: onCreatePlan,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (!selectedDayHasExercises) {
+      return Padding(
+        padding: EdgeInsets.only(
+          top: isDesktop ? 96 : 0,
+        ),
+        child: Center(
+          child: SizedBox(
+            width: isDesktop ? 270 : double.infinity,
+            child: PatientOverviewEmptyState(
+              text: 'На выбранный день тренировки нет.',
+              buttonText: 'Редактировать',
+              onButtonPressed: onEditPlan,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        PatientProgramExerciseList(
+          exercises: selectedProgramExercises,
+        ),
+
+        const SizedBox(height: 20),
+
+        PrimaryButton(
+          text: 'Редактировать',
+          onPressed: onEditPlan,
+          height: 38,
+          textStyle: Theme.of(context).textTheme.titleSmall,
+        ),
+      ],
     );
   }
 }
@@ -219,7 +489,7 @@ class _DateRow extends StatelessWidget {
         Expanded(
           child: Text(
             dateText,
-            style: textTheme.titleSmall
+            style: textTheme.titleSmall,
           ),
         ),
         if (exercisesCount != null)
@@ -227,7 +497,7 @@ class _DateRow extends StatelessWidget {
             _formatExercisesCount(exercisesCount!),
             style: textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
-            )
+            ),
           ),
       ],
     );

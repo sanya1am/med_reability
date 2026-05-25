@@ -7,16 +7,20 @@ import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/app_top_actions_bar.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
 
+import '../widgets/rehabilitation_plan_page_layout.dart';
+
 class RehabilitationDayExerciseDeletePage extends ConsumerStatefulWidget {
   final RehabilitationProgramEditorArgs args;
   final int weekIndex;
   final int dayIndex;
+  final List<String> breadcrumbLabels;
 
   const RehabilitationDayExerciseDeletePage({
     super.key,
     required this.args,
     required this.weekIndex,
     required this.dayIndex,
+    this.breadcrumbLabels = const [],
   });
 
   @override
@@ -40,67 +44,73 @@ class _RehabilitationDayExerciseDeletePageState
 
     final day = state.weeks[widget.weekIndex].days[widget.dayIndex];
 
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-          children: [
-            AppTopActionsBar(
-              onBack: () => Navigator.pop(context),
-              onNotify: () {},
-            ),
-            const SizedBox(height: 34),
-            ...List.generate(day.exercises.length, (index) {
-              final item = day.exercises[index];
-              final selected = selectedIndexes.contains(index);
+    final labels = widget.breadcrumbLabels.isNotEmpty
+        ? widget.breadcrumbLabels
+        : const [
+      'Редактирование плана',
+      'Удаление упражнений',
+    ];
 
-              return _DeleteExerciseTile(
-                item: item,
-                selected: selected,
-                onTap: () {
-                  setState(() {
-                    if (selected) {
-                      selectedIndexes.remove(index);
-                    } else {
-                      selectedIndexes.add(index);
-                    }
-                  });
-                },
-              );
-            }),
-            const SizedBox(height: 12),
-            PrimaryButton(
-              text: 'Удалить',
-              onPressed: selectedIndexes.isEmpty
-                  ? null
-                  : () async {
-                final confirmed =
-                await showRehabilitationDeleteExercisesDialog(
-                  context: context,
-                );
-
-                if (confirmed != true) return;
-
-                final sorted = selectedIndexes.toList()
-                  ..sort((a, b) => b.compareTo(a));
-
-                for (final index in sorted) {
-                  vm.removeExerciseFromDay(
-                    weekIndex: widget.weekIndex,
-                    dayIndex: widget.dayIndex,
-                    exerciseIndex: index,
-                  );
-                }
-
-                if (!context.mounted) return;
-                Navigator.pop(context);
-              },
-              height: 38,
-              textStyle: Theme.of(context).textTheme.titleSmall,
-            ),
-          ],
-        ),
+    return RehabilitationPlanPageLayout(
+      breadcrumbs: rehabilitationPlanBreadcrumbs(
+        context,
+        labels,
       ),
+      desktopHeaderSpacing: 30,
+      mobileHeaderSpacing: 34,
+      mobilePadding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+      children: [
+        ...List.generate(day.exercises.length, (index) {
+          final item = day.exercises[index];
+          final selected = selectedIndexes.contains(index);
+
+          return _DeleteExerciseTile(
+            item: item,
+            selected: selected,
+            onTap: () {
+              setState(() {
+                if (selected) {
+                  selectedIndexes.remove(index);
+                } else {
+                  selectedIndexes.add(index);
+                }
+              });
+            },
+          );
+        }),
+
+        const SizedBox(height: 12),
+
+        PrimaryButton(
+          text: 'Удалить',
+          onPressed: selectedIndexes.isEmpty
+              ? null
+              : () async {
+            final confirmed =
+            await showRehabilitationDeleteExercisesDialog(
+              context: context,
+            );
+
+            if (confirmed != true) return;
+
+            final sorted = selectedIndexes.toList()
+              ..sort((a, b) => b.compareTo(a));
+
+            for (final index in sorted) {
+              vm.removeExerciseFromDay(
+                weekIndex: widget.weekIndex,
+                dayIndex: widget.dayIndex,
+                exerciseIndex: index,
+              );
+            }
+
+            if (!context.mounted) return;
+            Navigator.pop(context);
+          },
+          height: 38,
+          textStyle: Theme.of(context).textTheme.titleSmall,
+        ),
+      ],
     );
   }
 }

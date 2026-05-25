@@ -33,43 +33,57 @@ class ClinicUserDto {
   final String firstName;
   final String patronymic;
   final String lastName;
-  final String role;
   final String phoneNumber;
+  final String? imageUrl;
+  final UserRole role;
   final bool isActive;
+  final bool hasActivePlan;
 
-  ClinicUserDto({
+  const ClinicUserDto({
     required this.id,
     required this.clinicId,
     required this.email,
     required this.firstName,
     required this.patronymic,
     required this.lastName,
-    required this.role,
     required this.phoneNumber,
+    required this.imageUrl,
+    required this.role,
     required this.isActive,
+    required this.hasActivePlan,
   });
 
-  factory ClinicUserDto.fromJson(Map<String, dynamic> json) => ClinicUserDto(
-    id: json['id'] as String,
-    clinicId: json['clinicId'] as String,
-    email: json['email'] as String,
-    firstName: (json['firstName'] ?? '') as String,
-    patronymic: (json['patronymic'] ?? '') as String,
-    lastName: (json['lastName'] ?? '') as String,
-    role: (json['role'] ?? '') as String,
-    phoneNumber: (json['phoneNumber'] ?? '') as String,
-    isActive: (json['isActive'] ?? false) as bool,
-  );
+  factory ClinicUserDto.fromJson(Map<String, dynamic> json) {
+    return ClinicUserDto(
+      id: json['id'] as String? ?? '',
+      clinicId: json['clinicId'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      firstName: json['firstName'] as String? ?? '',
+      patronymic: json['patronymic'] as String? ?? '',
+      lastName: json['lastName'] as String? ?? '',
+      phoneNumber: json['phoneNumber'] as String? ?? '',
+      imageUrl: json['imageUrl'] as String?,
+      role: _mapRole(json['role'] as String? ?? ''),
+      isActive: json['isActive'] as bool? ?? false,
+      hasActivePlan: json['hasActivePlan'] as bool? ?? false,
+    );
+  }
 
-  ClinicUser toEntity() => ClinicUser(
-    id: id,
-    clinicId: clinicId,
-    email: email,
-    firstName: firstName,
-    lastName: lastName,
-    role: _mapRole(role),
-    isActive: isActive,
-  );
+  ClinicUser toEntity() {
+    return ClinicUser(
+      id: id,
+      clinicId: clinicId,
+      email: email,
+      firstName: firstName,
+      patronymic: patronymic,
+      lastName: lastName,
+      phoneNumber: phoneNumber,
+      imageUrl: imageUrl,
+      role: role,
+      isActive: isActive,
+      hasActivePlan: hasActivePlan,
+    );
+  }
 }
 
 class UsersPageDto {
@@ -102,22 +116,22 @@ class UsersPageDto {
   );
 }
 
-Map<String, dynamic> createUserBody({
-  required String email,
-  required String password,
-  required String firstName,
-  required String patronymic,
-  required String lastName,
-  required String phoneNumber,
-  required UserRole role,
-}) {
-  return {
-    'email': email,
-    'password': password,
-    'firstName': firstName,
-    'patronymic': patronymic,
-    'lastName': lastName,
-    'phoneNumber': phoneNumber,
-    'role': _roleToApi(role),
-  };
-}
+// Map<String, dynamic> createUserBody({
+//   required String email,
+//   required String password,
+//   required String firstName,
+//   required String patronymic,
+//   required String lastName,
+//   required String phoneNumber,
+//   required UserRole role,
+// }) {
+//   return {
+//     'email': email,
+//     'password': password,
+//     'firstName': firstName,
+//     'patronymic': patronymic,
+//     'lastName': lastName,
+//     'phoneNumber': phoneNumber,
+//     'role': _roleToApi(role),
+//   };
+// }

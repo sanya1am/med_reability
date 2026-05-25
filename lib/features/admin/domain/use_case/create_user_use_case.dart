@@ -1,6 +1,7 @@
 import 'package:med_reability/features/auth/domain/entities/role.dart';
 
 import '../entities/clinic_user.dart';
+import '../entities/user_image_file.dart';
 import '../repositories/users_repository.dart';
 
 class CreateUserUseCase {
@@ -15,6 +16,7 @@ class CreateUserUseCase {
     required String lastName,
     required String phoneNumber,
     required UserRole role,
+    UserImageFile? image,
   }) {
     return _repo.createUser(
       email: email,
@@ -24,6 +26,7 @@ class CreateUserUseCase {
       lastName: lastName,
       phoneNumber: phoneNumber,
       role: role,
+      image: image,
     );
   }
 }

@@ -6,6 +6,8 @@ import 'package:med_reability/features/rehabilitation_plan/presentation/page/reh
 import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/app_top_actions_bar.dart';
 
+import '../widgets/rehabilitation_plan_page_layout.dart';
+
 final rehabilitationProgramDetailsProvider =
 FutureProvider.autoDispose.family<RehabilitationProgram, String>(
       (ref, programId) {
@@ -31,39 +33,39 @@ class RehabilitationProgramEditLoaderPage extends ConsumerWidget {
 
     final colors = context.appColors;
 
-    return Scaffold(
-      body: SafeArea(
-        child: async.when(
-          loading: () => const Center(
+    return async.when(
+      loading: () => const Scaffold(
+        body: SafeArea(
+          child: Center(
             child: CircularProgressIndicator(),
           ),
-          error: (error, _) => Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-            child: Column(
-              children: [
-                AppTopActionsBar(
-                  onBack: () => Navigator.pop(context),
-                  onNotify: () {},
-                ),
-                const SizedBox(height: 40),
-                Text(
-                  'Ошибка: $error',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          data: (program) {
-            return RehabilitationProgramWeeksPage(
-              patientId: program.patientId,
-              initialProgram: program,
-            );
-          },
         ),
       ),
+      error: (error, _) => RehabilitationPlanPageLayout(
+        breadcrumbs: rehabilitationPlanBreadcrumbs(
+          context,
+          const [
+            'Редактирование плана',
+          ],
+        ),
+        desktopHeaderSpacing: 40,
+        mobileHeaderSpacing: 40,
+        children: [
+          Text(
+            'Ошибка: $error',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colors.textPrimary,
+            ),
+          ),
+        ],
+      ),
+      data: (program) {
+        return RehabilitationProgramWeeksPage(
+          patientId: program.patientId,
+          initialProgram: program,
+        );
+      },
     );
   }
 }

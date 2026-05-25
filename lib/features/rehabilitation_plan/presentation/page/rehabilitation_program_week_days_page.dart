@@ -6,6 +6,7 @@ import 'package:med_reability/features/rehabilitation_plan/presentation/view_mod
 import 'package:med_reability/features/rehabilitation_plan/presentation/widgets/rehabilitation_program_day_card.dart';
 import 'package:med_reability/features/rehabilitation_plan/presentation/widgets/templates/rehabilitation_day_template_picker_dialog.dart';
 import '../../../../utils/widgets/app_top_actions_bar.dart';
+import '../widgets/rehabilitation_plan_page_layout.dart';
 import '../widgets/rehabilitation_plan_switcher.dart';
 
 
@@ -52,120 +53,117 @@ class RehabilitationProgramWeekDaysPage extends ConsumerWidget {
 
     final week = editorState.weeks[weekIndex];
 
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(28, 16, 28, 24),
-          children: [
-            AppTopActionsBar(onBack: () => Navigator.pop(context), onNotify: () {}),
-
-            const SizedBox(height: 34),
-
-            RehabilitationPlanSwitcher(
-              title: 'Неделя ${weekIndex + 1}',
-              canGoPrevious: weekIndex  > 0,
-              canGoNext: weekIndex  < editorState.weeks.length - 1,
-              onPrevious: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (_) => RehabilitationProgramWeekDaysPage(
-                      args: args,
-                      weekIndex: weekIndex - 1,
-                    ),
-                  ),
-                );
-              },
-              onNext: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (_) => RehabilitationProgramWeekDaysPage(
-                      args: args,
-                      weekIndex: weekIndex  + 1,
-                    ),
-                  ),
-                );
-              },
-            ),
-
-            const SizedBox(height: 20),
-
-            ...List.generate(week.days.length, (dayIndex) {
-              final day = week.days[dayIndex];
-
-              return RehabilitationProgramDayCard(
-                dayNumber: day.dayNumber,
-                isRestDay: day.isRestDay,
-                exercisesCount: day.exercises.length,
-                hasNotes: day.notes != null && day.notes!.trim().isNotEmpty,
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => RehabilitationProgramDayEditorPage(
-                        args: args,
-                        weekIndex: weekIndex,
-                        dayIndex: dayIndex,
-                      ),
-                    ),
-                  );
-                },
-                onSaveAsTemplate: () {
-                  templatesVm.saveDayTemplate(
-                    name: 'День ${day.dayNumber}',
-                    day: day.toEntity(),
-                  );
-
-                  final error = ref
-                      .read(
-                    rehabilitationProgramTemplatesViewModelProvider(
-                      args.scopeId,
-                    ),
-                  )
-                      .errorMessage;
-
-                  if (error != null && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(error)),
-                    );
-
-                    templatesVm.clearError();
-                  }
-                },
-                onFillFromTemplate: () async {
-                  if (templatesState.dayTemplates.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Нет сохранённых шаблонов дней'),
-                      ),
-                    );
-                    return;
-                  }
-
-                  final template =
-                  await showRehabilitationDayTemplatePickerDialog(
-                    context: context,
-                    templates: templatesState.dayTemplates,
-                    onDeleteTemplate: templatesVm.deleteDayTemplate,
-                  );
-
-                  if (template == null) return;
-
-                  editorVm.applyDayTemplate(
-                    weekIndex: weekIndex,
-                    dayIndex: dayIndex,
-                    template: template,
-                  );
-                },
-                onClear: () {
-                  editorVm.clearDay(
-                    weekIndex: weekIndex,
-                    dayIndex: dayIndex,
-                  );
-                },
-              );
-            }),
-          ],
-        ),
+    return RehabilitationPlanPageLayout(
+      breadcrumbs: rehabilitationPlanBreadcrumbs(
+        context,
+        [
+          editorState.isEdit ? 'Редактирование плана' : 'Создание плана',
+          'Неделя ${weekIndex + 1}',
+        ],
       ),
+      desktopHeaderSpacing: 30,
+      mobileHeaderSpacing: 34,
+      children: [
+        RehabilitationPlanSwitcher(
+          title: 'Неделя ${weekIndex + 1}',
+          canGoPrevious: weekIndex > 0,
+          canGoNext: weekIndex < editorState.weeks.length - 1,
+          onPrevious: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => RehabilitationProgramWeekDaysPage(
+                  args: args,
+                  weekIndex: weekIndex - 1,
+                ),
+              ),
+            );
+          },
+          onNext: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => RehabilitationProgramWeekDaysPage(
+                  args: args,
+                  weekIndex: weekIndex + 1,
+                ),
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(height: 20),
+
+        ...List.generate(week.days.length, (dayIndex) {
+          final day = week.days[dayIndex];
+
+          return RehabilitationProgramDayCard(
+            dayNumber: day.dayNumber,
+            isRestDay: day.isRestDay,
+            exercisesCount: day.exercises.length,
+            hasNotes: day.notes != null && day.notes!.trim().isNotEmpty,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => RehabilitationProgramDayEditorPage(
+                    args: args,
+                    weekIndex: weekIndex,
+                    dayIndex: dayIndex,
+                  ),
+                ),
+              );
+            },
+            onSaveAsTemplate: () {
+              templatesVm.saveDayTemplate(
+                name: 'День ${day.dayNumber}',
+                day: day.toEntity(),
+              );
+
+              final error = ref
+                  .read(
+                rehabilitationProgramTemplatesViewModelProvider(args.scopeId),
+              )
+                  .errorMessage;
+
+              if (error != null && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(error)),
+                );
+
+                templatesVm.clearError();
+              }
+            },
+            onFillFromTemplate: () async {
+              if (templatesState.dayTemplates.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Нет сохранённых шаблонов дней'),
+                  ),
+                );
+                return;
+              }
+
+              final template = await showRehabilitationDayTemplatePickerDialog(
+                context: context,
+                templates: templatesState.dayTemplates,
+                onDeleteTemplate: templatesVm.deleteDayTemplate,
+              );
+
+              if (template == null) return;
+
+              editorVm.applyDayTemplate(
+                weekIndex: weekIndex,
+                dayIndex: dayIndex,
+                template: template,
+              );
+            },
+            onClear: () {
+              editorVm.clearDay(
+                weekIndex: weekIndex,
+                dayIndex: dayIndex,
+              );
+            },
+          );
+        }),
+      ],
     );
   }
 }

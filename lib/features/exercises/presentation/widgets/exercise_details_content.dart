@@ -10,8 +10,132 @@ class ExerciseDetailsContent extends StatelessWidget {
   final Widget bottomActions;
   final bool showTypePill;
   final Widget? afterTitle;
+  final bool isDesktopLayout;
 
   const ExerciseDetailsContent({
+    super.key,
+    required this.exercise,
+    required this.bottomActions,
+    this.showTypePill = true,
+    this.afterTitle,
+    this.isDesktopLayout = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (isDesktopLayout) {
+      return _DesktopExerciseDetailsContent(
+        exercise: exercise,
+        bottomActions: bottomActions,
+        showTypePill: showTypePill,
+        afterTitle: afterTitle,
+      );
+    }
+
+    return _MobileExerciseDetailsContent(
+      exercise: exercise,
+      bottomActions: bottomActions,
+      showTypePill: showTypePill,
+      afterTitle: afterTitle,
+    );
+  }
+}
+
+class _DesktopExerciseDetailsContent extends StatelessWidget {
+  final Exercise exercise;
+  final Widget bottomActions;
+  final bool showTypePill;
+  final Widget? afterTitle;
+
+  const _DesktopExerciseDetailsContent({
+    required this.exercise,
+    required this.bottomActions,
+    required this.showTypePill,
+    required this.afterTitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 443,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ExerciseMediaSlider(
+                mediaUrls: exercise.mediaUrls,
+              ),
+
+              const SizedBox(height: 18),
+
+              Text(
+                exercise.name,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+
+              const SizedBox(height: 16),
+
+              if (showTypePill) ...[
+                _ExerciseTypePill(exercise: exercise),
+                const SizedBox(height: 16),
+              ],
+
+              if (afterTitle != null) ...[
+                afterTitle!,
+                const SizedBox(height: 16),
+              ],
+
+              _ExerciseDescriptionCard(
+                description: exercise.description,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(width: 28),
+
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Инструкция',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+
+              const SizedBox(height: 14),
+
+              ...List.generate(exercise.steps.length, (index) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: ExerciseInstructionCard(
+                    number: index + 1,
+                    text: exercise.steps[index],
+                  ),
+                );
+              }),
+
+              const SizedBox(height: 8),
+
+              bottomActions,
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MobileExerciseDetailsContent extends StatelessWidget {
+  final Exercise exercise;
+  final Widget bottomActions;
+  final bool showTypePill;
+  final Widget? afterTitle;
+
+  const _MobileExerciseDetailsContent({
     super.key,
     required this.exercise,
     required this.bottomActions,
@@ -31,31 +155,15 @@ class ExerciseDetailsContent extends StatelessWidget {
           mediaUrls: exercise.mediaUrls,
         ),
 
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
 
-        if (showTypePill) ...[
-          Container(
-            width: double.infinity,
-            height: 28,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: colors.surface,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              exerciseTypeLabel(exercise.type),
-              style: textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colors.textPrimary,
-              ),
-            ),
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            exercise.name,
+            style: textTheme.headlineMedium,
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 18),
-        ],
-
-        Text(
-          exercise.name,
-          style: textTheme.headlineMedium,
         ),
 
         if (afterTitle != null) ...[
@@ -63,7 +171,14 @@ class ExerciseDetailsContent extends StatelessWidget {
           afterTitle!,
         ],
 
-        const SizedBox(height: 22),
+        const SizedBox(height: 28),
+
+        if (showTypePill) ...[
+          _ExerciseTypePill(exercise: exercise),
+          const SizedBox(height: 16),
+        ],
+
+        // const SizedBox(height: 22),
 
         _ExerciseInfoCard(
           title: 'Описание',
@@ -133,6 +248,71 @@ class _ExerciseInfoCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           child,
+        ],
+      ),
+    );
+  }
+}
+
+class _ExerciseTypePill extends StatelessWidget {
+  final Exercise exercise;
+
+  const _ExerciseTypePill({
+    required this.exercise,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    
+    return Container(
+      width: double.infinity,
+      height: 46,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        exerciseTypeLabel(exercise.type),
+        style: Theme.of(context).textTheme.titleSmall,
+      ),
+    );
+  }
+}
+
+class _ExerciseDescriptionCard extends StatelessWidget {
+  final String description;
+
+  const _ExerciseDescriptionCard({
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Описание',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colors.textPrimary,
+            ),
+          ),
         ],
       ),
     );

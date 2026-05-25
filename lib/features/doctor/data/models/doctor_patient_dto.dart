@@ -1,5 +1,6 @@
-import '../../domain/entities/doctor_patient.dart';
+import 'package:med_reability/core/services/media_url_helper.dart';
 
+import '../../domain/entities/doctor_patient.dart';
 
 class DoctorPatientDto {
   final String assignmentId;
@@ -9,6 +10,7 @@ class DoctorPatientDto {
   final String lastName;
   final String email;
   final String phoneNumber;
+  final String? imageUrl;
   final bool isActive;
   final bool hasPlan;
 
@@ -20,21 +22,29 @@ class DoctorPatientDto {
     required this.lastName,
     required this.email,
     required this.phoneNumber,
+    required this.imageUrl,
     required this.isActive,
     required this.hasPlan,
   });
 
-  factory DoctorPatientDto.fromJson(Map<String, dynamic> json) => DoctorPatientDto(
-    assignmentId: (json['assignmentId'] as String?) ?? '',
-    patientId: (json['patientId'] as String?) ?? '',
-    firstName: (json['firstName'] as String?) ?? '',
-    patronymic: (json['patronymic'] as String?) ?? '',
-    lastName: (json['lastName'] as String?) ?? '',
-    email: (json['email'] as String?) ?? '',
-    phoneNumber: (json['phoneNumber'] as String?) ?? '',
-    isActive: (json['isActive'] as bool?) ?? false,
-    hasPlan: (json['hasPlan'] as bool?) ?? false,
-  );
+  factory DoctorPatientDto.fromJson(Map<String, dynamic> json) {
+    final rawImageUrl = json['imageUrl'] as String?;
+
+    return DoctorPatientDto(
+      assignmentId: (json['assignmentId'] as String?) ?? '',
+      patientId: (json['patientId'] as String?) ?? '',
+      firstName: (json['firstName'] as String?) ?? '',
+      patronymic: (json['patronymic'] as String?) ?? '',
+      lastName: (json['lastName'] as String?) ?? '',
+      email: (json['email'] as String?) ?? '',
+      phoneNumber: (json['phoneNumber'] as String?) ?? '',
+      imageUrl: rawImageUrl == null || rawImageUrl.isEmpty
+          ? null
+          : normalizeMediaUrl(rawImageUrl),
+      isActive: (json['isActive'] as bool?) ?? false,
+      hasPlan: (json['hasPlan'] as bool?) ?? false,
+    );
+  }
 
   DoctorPatient toEntity() => DoctorPatient(
     assignmentId: assignmentId,
@@ -44,6 +54,7 @@ class DoctorPatientDto {
     lastName: lastName,
     email: email,
     phoneNumber: phoneNumber,
+    imageUrl: imageUrl,
     isActive: isActive,
     hasPlan: hasPlan,
   );

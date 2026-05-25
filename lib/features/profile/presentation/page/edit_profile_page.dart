@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:med_reability/utils/widgets/app_secondary_button.dart';
 import 'package:med_reability/utils/widgets/app_top_actions_bar.dart';
 import 'package:med_reability/utils/assets/app_assets.dart';
@@ -9,6 +10,7 @@ import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/app_circle_icon_button.dart';
 import 'package:med_reability/utils/widgets/app_text_field.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
+import '../../../../utils/widgets/app_breadcrumbs.dart';
 import '../state/edit_profile_state.dart';
 import '../view_model/edit_profile_view_model.dart';
 import '../widgets/change_password_dialog.dart';
@@ -92,7 +94,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     if (!mounted) return;
 
     if (error == null) {
-      Navigator.pop(context, true);
+      context.pop(true);
       return;
     }
 
@@ -139,72 +141,130 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           data: (state) {
             _hydrateControllersIfNeeded(state);
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(28, 12, 28, 24),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 430),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final isDesktop = constraints.maxWidth >= 900;
+
+                final content = Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (isDesktop) ...[
+                      AppBreadcrumbs(
+                        onBack: () => context.pop(),
+                        items: [
+                          AppBreadcrumbItem(
+                            label: 'Главная',
+                            onTap: () => context.pop(),
+                          ),
+                          const AppBreadcrumbItem(
+                            label: 'Редактирование профиля',
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+                    ] else ...[
                       AppTopActionsBar(
-                        onBack: () => Navigator.pop(context),
-                        onNotify: () {},
+                        onBack: () => context.pop(),
                       ),
                       const SizedBox(height: 16),
+                    ],
 
-                      Center(
-                        child: ProfileAvatarPicker(
-                          imageUrl: state.user.imageUrl,
-                          imageBytes: state.pickedImageBytes,
-                          onTap: _pickImage,
-                        ),
+                    Center(
+                      child: ProfileAvatarPicker(
+                        imageUrl: state.user.imageUrl,
+                        imageBytes: state.pickedImageBytes,
+                        onTap: _pickImage,
                       ),
-                      const SizedBox(height: 22),
+                    ),
 
-                      Text('Фамилия', style: Theme.of(context).textTheme.bodyMedium),
-                      const SizedBox(height: 8),
-                      AppTextField(
-                        hintText: 'Фамилия',
-                        controller: lastCtrl,
-                      ),
-                      const SizedBox(height: 16),
+                    const SizedBox(height: 22),
 
-                      Text('Имя', style: Theme.of(context).textTheme.bodyMedium),
-                      const SizedBox(height: 8),
-                      AppTextField(
-                        hintText: 'Имя',
-                        controller: firstCtrl,
-                      ),
-                      const SizedBox(height: 16),
+                    Text(
+                      'Фамилия',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    AppTextField(
+                      hintText: 'Фамилия',
+                      controller: lastCtrl,
+                    ),
 
-                      Text('Отчество', style: Theme.of(context).textTheme.bodyMedium),
-                      const SizedBox(height: 8),
-                      AppTextField(
-                        hintText: 'Отчество',
-                        controller: patronymicCtrl,
-                      ),
-                      const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                      Text('Почта', style: Theme.of(context).textTheme.bodyMedium),
-                      const SizedBox(height: 8),
-                      AppTextField(
-                        hintText: 'Почта',
-                        controller: emailCtrl,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(height: 16),
+                    Text(
+                      'Имя',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    AppTextField(
+                      hintText: 'Имя',
+                      controller: firstCtrl,
+                    ),
 
-                      Text('Телефон', style: Theme.of(context).textTheme.bodyMedium),
-                      const SizedBox(height: 8),
-                      AppTextField(
-                        hintText: 'Телефон',
-                        controller: phoneCtrl,
-                        keyboardType: TextInputType.phone,
-                      ),
-                      const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
+                    Text(
+                      'Отчество',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    AppTextField(
+                      hintText: 'Отчество',
+                      controller: patronymicCtrl,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    Text(
+                      'Почта',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    AppTextField(
+                      hintText: 'Почта',
+                      controller: emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    Text(
+                      'Телефон',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    AppTextField(
+                      hintText: 'Телефон',
+                      controller: phoneCtrl,
+                      keyboardType: TextInputType.phone,
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    if (isDesktop)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SecondaryButton(
+                              text: 'Изменить пароль',
+                              onPressed: _openChangePasswordDialog,
+                              height: 38,
+                              textStyle: Theme.of(context).textTheme.titleSmall,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: PrimaryButton(
+                              text: 'Сохранить',
+                              onPressed: state.isSubmitting ? null : () => _save(state),
+                              loading: state.isSubmitting,
+                              height: 38,
+                              textStyle: Theme.of(context).textTheme.titleSmall,
+                            ),
+                          ),
+                        ],
+                      )
+                    else ...[
                       SecondaryButton(
                         text: 'Изменить пароль',
                         onPressed: _openChangePasswordDialog,
@@ -222,9 +282,22 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         textStyle: Theme.of(context).textTheme.titleSmall,
                       ),
                     ],
+                  ],
+                );
+
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(28, 12, 28, 24),
+                  child: isDesktop
+                      ? content
+                      : Align(
+                    alignment: Alignment.topCenter,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 430),
+                      child: content,
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         ),
