@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:med_reability/features/admin/domain/entities/clinic_user.dart';
 import 'package:med_reability/features/admin/presentation/state/users_state.dart';
 import 'package:med_reability/features/admin/presentation/widgets/users_list.dart';
+import 'package:med_reability/utils/theme/app_theme.dart';
+import 'package:med_reability/utils/widgets/app_text_field.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
 
-class AdminUsersPageContent extends StatelessWidget {
+class AdminUsersPageContent extends StatefulWidget {
   final String title;
   final UsersTab tab;
   final UsersState state;
@@ -18,11 +21,51 @@ class AdminUsersPageContent extends StatelessWidget {
   });
 
   @override
+  State<AdminUsersPageContent> createState() => _AdminUsersPageContentState();
+}
+
+class _AdminUsersPageContentState extends State<AdminUsersPageContent> {
+  final searchCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    searchCtrl.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    searchCtrl.removeListener(_onSearchChanged);
+    searchCtrl.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final users = switch (tab) {
-      UsersTab.doctors => state.doctors,
-      UsersTab.patients => state.patients,
+    final colors = context.appColors;
+
+    final sourceUsers = switch (widget.tab) {
+      UsersTab.doctors => widget.state.doctors,
+      UsersTab.patients => widget.state.patients,
     };
+
+    final query = searchCtrl.text.trim().toLowerCase();
+
+    final filteredUsers = query.isEmpty
+        ? sourceUsers
+        : sourceUsers.where((user) {
+      final haystack = [
+        user.fullName,
+        user.email,
+        user.phoneNumber,
+      ].join(' ').toLowerCase();
+
+      return haystack.contains(query);
+    }).toList();
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -38,32 +81,68 @@ class AdminUsersPageContent extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        title,
+                        widget.title,
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),
-                    SizedBox(
-                      width: 170,
-                      child: PrimaryButton(
-                        text: 'Создать',
-                        onPressed: onCreate,
-                        height: 38,
-                        textStyle: Theme.of(context).textTheme.titleSmall,
+                    GestureDetector(
+                      onTap: widget.onCreate,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 24,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 16),
             ],
+
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                isDesktop ? 32 : 28,
+                isDesktop ? 0 : 16,
+                isDesktop ? 32 : 28,
+                0,
+              ),
+              child: AppTextField(
+                hintText: 'Найти пользователя',
+                controller: searchCtrl,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
             Expanded(
-              child: UsersList(
-                users: users,
-                state: state,
-                tab: tab,
+              child: filteredUsers.isEmpty
+                  ? Center(
+                child: Text(
+                  query.isEmpty
+                      ? 'Пусто'
+                      : 'По вашему запросу ничего не найдено',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                ),
+              )
+                  : UsersList(
+                users: filteredUsers.cast<ClinicUser>(),
+                state: widget.state,
+                tab: widget.tab,
                 padding: EdgeInsets.fromLTRB(
                   isDesktop ? 32 : 28,
-                  isDesktop ? 16 : 16,
+                  0,
                   isDesktop ? 32 : 28,
                   isDesktop ? 32 : 120,
                 ),

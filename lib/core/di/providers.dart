@@ -33,6 +33,7 @@ import 'package:med_reability/features/exercises/domain/use_case/get_exercises_u
 import 'package:med_reability/features/exercises/domain/use_case/update_exercise_use_case.dart';
 import 'package:med_reability/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:med_reability/features/profile/domain/repositories/profile_repository.dart';
+import '../../features/admin/domain/use_case/update_user_use_case.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/use_case/login_use_case.dart';
 import '../../features/auth/domain/use_case/logout_use_case.dart';
@@ -124,6 +125,7 @@ final searchClinicsUseCaseProvider = Provider((ref) => SearchClinicsUseCase(ref.
 final getUserMeUseCaseProvider = Provider((ref) => GetUserMeUseCase(ref.read(userMeRepositoryProvider)));
 final listUsersUseCaseProvider = Provider((ref) => ListUsersUseCase(ref.read(usersRepositoryProvider)));
 final createUserUseCaseProvider = Provider((ref) => CreateUserUseCase(ref.read(usersRepositoryProvider)));
+final updateUserUseCaseProvider = Provider((ref) => UpdateUserUseCase(ref.read(usersRepositoryProvider)));
 final deactivateUserUseCaseProvider = Provider((ref) => DeactivateUserUseCase(ref.read(usersRepositoryProvider)));
 final activateUserUseCaseProvider = Provider((ref) => ActivateUserUseCase(ref.read(usersRepositoryProvider)));
 final getAssignmentsUseCaseProvider = Provider((ref) => GetAssignmentsUseCase(ref.read(assignmentsRepositoryProvider)));

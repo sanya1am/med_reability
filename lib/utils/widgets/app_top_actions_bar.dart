@@ -6,12 +6,10 @@ import 'package:med_reability/utils/widgets/app_circle_icon_button.dart';
 
 class AppTopActionsBar extends StatelessWidget {
   final VoidCallback onBack;
-  final VoidCallback onNotify;
 
   const AppTopActionsBar({
     super.key,
     required this.onBack,
-    required this.onNotify,
   });
 
   @override
@@ -26,19 +24,6 @@ class AppTopActionsBar extends StatelessWidget {
             Icons.arrow_back_ios_new,
             size: 18,
             color: colors.textPrimary,
-          ),
-        ),
-        const Spacer(),
-        AppCircleIconButton(
-          onTap: onNotify,
-          icon: SvgPicture.asset(
-            AppAssets.notificationsIcon,
-            width: 18,
-            height: 18,
-            colorFilter: ColorFilter.mode(
-              colors.textPrimary,
-              BlendMode.srcIn,
-            ),
           ),
         ),
       ],

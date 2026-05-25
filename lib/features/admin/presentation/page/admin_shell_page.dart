@@ -60,9 +60,15 @@ class _AdminShellPageState extends ConsumerState<AdminShellPage> {
   }
 
   Future<void> _openCreate() async {
-    final created = await context.pushNamed<bool>(
-      AppRouteNames.adminCreateUser,
-    );
+    final routeName = switch (widget.navigationShell.currentIndex) {
+      0 => AppRouteNames.adminDoctorsUserForm,
+      1 => AppRouteNames.adminPatientsUserForm,
+      _ => null,
+    };
+
+    if (routeName == null) return;
+
+    final created = await context.pushNamed<bool>(routeName);
 
     if (created == true && mounted) {
       await ref.read(usersViewModelProvider.notifier).refresh();

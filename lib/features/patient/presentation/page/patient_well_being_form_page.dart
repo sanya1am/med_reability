@@ -50,7 +50,7 @@ class _PatientWellBeingFormPageState
                   minHeight: constraints.maxHeight,
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(28, 12, 28, 32),
+                  padding: const EdgeInsets.fromLTRB(28, 12, 28, 120),
                   child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

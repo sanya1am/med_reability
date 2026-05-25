@@ -12,6 +12,7 @@ import 'package:med_reability/utils/widgets/app_top_actions_bar.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
 
 import '../state/rehabilitation_program_editor_state.dart';
+import '../widgets/rehabilitation_plan_page_layout.dart';
 import '../widgets/rehabilitation_program_delete_dialog.dart';
 import '../widgets/rehabilitation_program_submit_dialog.dart';
 
@@ -64,119 +65,115 @@ class _RehabilitationProgramWeeksPageState
 
     final colors = context.appColors;
 
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(28, 16, 28, 24),
-          children: [
-            AppTopActionsBar(onBack: () => Navigator.pop(context), onNotify: () {}),
-
-            const SizedBox(height: 38),
-
-            ...List.generate(editorState.weeks.length, (index) {
-              final week = editorState.weeks[index];
-
-              return RehabilitationProgramWeekCard(
-                weekNumber: week.weekNumber,
-                isFilled: week.isFilled,
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => RehabilitationProgramWeekDaysPage(
-                        args: args,
-                        weekIndex: index,
-                      ),
-                    ),
-                  );
-                },
-                onSaveAsTemplate: () {
-                  templatesVm.saveWeekTemplate(
-                    name: 'Неделя ${week.weekNumber}',
-                    days: week.days.map((day) => day.toEntity()).toList(),
-                  );
-
-                  final error = ref
-                      .read(
-                    rehabilitationProgramTemplatesViewModelProvider(
-                      args.scopeId,
-                    ),
-                  )
-                      .errorMessage;
-
-                  if (error != null && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(error)),
-                    );
-
-                    templatesVm.clearError();
-                  }
-                },
-                onFillFromTemplate: () async {
-                  if (templatesState.weekTemplates.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Нет сохранённых шаблонов недель'),
-                      ),
-                    );
-                    return;
-                  }
-
-                  final template =
-                  await showRehabilitationWeekTemplatePickerDialog(
-                    context: context,
-                    templates: templatesState.weekTemplates,
-                    onDeleteTemplate: templatesVm.deleteWeekTemplate,
-                  );
-
-                  if (template == null) return;
-
-                  editorVm.applyWeekTemplate(
-                    targetWeekIndex: index,
-                    template: template,
-                  );
-                },
-                onDelete: () {
-                  if (editorState.weeks.length == 1) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Нельзя удалить последнюю неделю'),
-                      ),
-                    );
-                    return;
-                  }
-
-                  editorVm.deleteWeek(index);
-                },
-              );
-            }),
-
-            const SizedBox(height: 4),
-
-            SecondaryButton(
-              text: 'Добавить неделю',
-              onPressed: editorVm.addWeek,
-              height: 38,
-              textStyle: Theme.of(context).textTheme.titleSmall,
-            ),
-
-            const SizedBox(height: 12),
-
-            PrimaryButton(
-              text: editorState.isEdit ? 'Сохранить план' : 'Назначить план',
-              onPressed: editorState.isSubmitting
-                  ? null
-                  : () => _submitPlan(
-                context: context,
-                ref: ref,
-                editorState: editorState,
-                editorVm: editorVm,
-              ),
-              height: 38,
-              textStyle: Theme.of(context).textTheme.titleSmall,
-            ),
-          ],
-        ),
+    return RehabilitationPlanPageLayout(
+      breadcrumbs: rehabilitationPlanBreadcrumbs(
+        context,
+        [
+          editorState.isEdit ? 'Редактирование плана' : 'Создание плана',
+        ],
       ),
+      desktopHeaderSpacing: 34,
+      mobileHeaderSpacing: 38,
+      children: [
+        ...List.generate(editorState.weeks.length, (index) {
+          final week = editorState.weeks[index];
+
+          return RehabilitationProgramWeekCard(
+            weekNumber: week.weekNumber,
+            isFilled: week.isFilled,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => RehabilitationProgramWeekDaysPage(
+                    args: args,
+                    weekIndex: index,
+                  ),
+                ),
+              );
+            },
+            onSaveAsTemplate: () {
+              templatesVm.saveWeekTemplate(
+                name: 'Неделя ${week.weekNumber}',
+                days: week.days.map((day) => day.toEntity()).toList(),
+              );
+
+              final error = ref
+                  .read(
+                rehabilitationProgramTemplatesViewModelProvider(args.scopeId),
+              )
+                  .errorMessage;
+
+              if (error != null && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(error)),
+                );
+
+                templatesVm.clearError();
+              }
+            },
+            onFillFromTemplate: () async {
+              if (templatesState.weekTemplates.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Нет сохранённых шаблонов недель'),
+                  ),
+                );
+                return;
+              }
+
+              final template = await showRehabilitationWeekTemplatePickerDialog(
+                context: context,
+                templates: templatesState.weekTemplates,
+                onDeleteTemplate: templatesVm.deleteWeekTemplate,
+              );
+
+              if (template == null) return;
+
+              editorVm.applyWeekTemplate(
+                targetWeekIndex: index,
+                template: template,
+              );
+            },
+            onDelete: () {
+              if (editorState.weeks.length == 1) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Нельзя удалить последнюю неделю'),
+                  ),
+                );
+                return;
+              }
+
+              editorVm.deleteWeek(index);
+            },
+          );
+        }),
+
+        const SizedBox(height: 4),
+
+        SecondaryButton(
+          text: 'Добавить неделю',
+          onPressed: editorVm.addWeek,
+          height: 38,
+          textStyle: Theme.of(context).textTheme.titleSmall,
+        ),
+
+        const SizedBox(height: 12),
+
+        PrimaryButton(
+          text: editorState.isEdit ? 'Сохранить план' : 'Назначить план',
+          onPressed: editorState.isSubmitting
+              ? null
+              : () => _submitPlan(
+            context: context,
+            ref: ref,
+            editorState: editorState,
+            editorVm: editorVm,
+          ),
+          height: 38,
+          textStyle: Theme.of(context).textTheme.titleSmall,
+        ),
+      ],
     );
   }
 

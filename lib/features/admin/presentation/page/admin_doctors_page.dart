@@ -12,7 +12,7 @@ class AdminDoctorsPage extends ConsumerWidget {
 
   Future<void> _openCreate(BuildContext context, WidgetRef ref) async {
     final created = await context.pushNamed<bool>(
-      AppRouteNames.adminCreateUser,
+      AppRouteNames.adminDoctorsUserForm,
     );
 
     if (created == true) {

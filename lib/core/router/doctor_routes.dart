@@ -6,6 +6,7 @@ import 'package:med_reability/features/doctor/presentation/page/doctor_shell_pag
 import 'package:med_reability/features/exercises/presentation/page/exercise_details_page.dart';
 import 'package:med_reability/features/exercises/presentation/page/exercises_page.dart';
 import '../../features/doctor/presentation/page/doctor_patient_overview_page.dart';
+import '../../features/profile/presentation/page/edit_profile_page.dart';
 import 'app_route_names.dart';
 
 final doctorShellRoute = StatefulShellRoute.indexedStack(
@@ -68,6 +69,13 @@ final doctorShellRoute = StatefulShellRoute.indexedStack(
           path: '/doctor/home',
           name: AppRouteNames.doctorHome,
           builder: (context, state) => const DoctorHomePage(),
+          routes: [
+            GoRoute(
+              path: 'edit-profile',
+              name: AppRouteNames.doctorEditProfile,
+              builder: (context, state) => const EditProfilePage(),
+            ),
+          ],
         ),
       ],
     ),

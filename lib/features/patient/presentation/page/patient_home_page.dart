@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:med_reability/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:med_reability/features/auth/presentation/view_model/user_me_view_model.dart';
 import 'package:med_reability/features/profile/presentation/page/edit_profile_page.dart';
@@ -7,6 +8,8 @@ import 'package:med_reability/features/profile/presentation/widgets/profile_avat
 import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/theme_switch_tile.dart';
 import 'package:med_reability/utils/widgets/user_info_card.dart';
+
+import '../../../../core/router/app_route_names.dart';
 
 class PatientHomePage extends ConsumerWidget {
   const PatientHomePage({super.key});
@@ -43,10 +46,8 @@ class PatientHomePage extends ConsumerWidget {
                 ref.read(authViewModelProvider.notifier).logout();
               },
               onEditPressed: () async {
-                final changed = await Navigator.of(context).push<bool>(
-                  MaterialPageRoute(
-                    builder: (_) => const EditProfilePage(),
-                  ),
+                final changed = await context.pushNamed<bool>(
+                  AppRouteNames.adminEditProfile,
                 );
 
                 if (changed == true) {

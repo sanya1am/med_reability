@@ -79,7 +79,7 @@ class _ClinicPickerSheetState extends ConsumerState<ClinicPickerSheet> {
               controller: _searchCtrl,
               style: Theme.of(context).textTheme.headlineSmall,
               decoration: InputDecoration(
-                labelText: 'Поиск поликлиники',
+                labelText: 'Поиск клиники',
                 labelStyle: Theme.of(context).textTheme.headlineSmall,
                 prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
                 prefixIcon: Padding(

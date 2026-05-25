@@ -60,7 +60,7 @@ class _DesktopExerciseDetailsContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 430,
+          width: 443,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -155,16 +155,15 @@ class _MobileExerciseDetailsContent extends StatelessWidget {
           mediaUrls: exercise.mediaUrls,
         ),
 
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
 
-        if (showTypePill) ...[
-          _ExerciseTypePill(exercise: exercise),
-          const SizedBox(height: 18),
-        ],
-
-        Text(
-          exercise.name,
-          style: textTheme.headlineMedium,
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            exercise.name,
+            style: textTheme.headlineMedium,
+            textAlign: TextAlign.center,
+          ),
         ),
 
         if (afterTitle != null) ...[
@@ -172,7 +171,14 @@ class _MobileExerciseDetailsContent extends StatelessWidget {
           afterTitle!,
         ],
 
-        const SizedBox(height: 22),
+        const SizedBox(height: 28),
+
+        if (showTypePill) ...[
+          _ExerciseTypePill(exercise: exercise),
+          const SizedBox(height: 16),
+        ],
+
+        // const SizedBox(height: 22),
 
         _ExerciseInfoCard(
           title: 'Описание',
@@ -261,7 +267,7 @@ class _ExerciseTypePill extends StatelessWidget {
     
     return Container(
       width: double.infinity,
-      height: 32,
+      height: 46,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: colors.surface,
@@ -269,7 +275,7 @@ class _ExerciseTypePill extends StatelessWidget {
       ),
       child: Text(
         exerciseTypeLabel(exercise.type),
-        style: Theme.of(context).textTheme.bodySmall,
+        style: Theme.of(context).textTheme.titleSmall,
       ),
     );
   }

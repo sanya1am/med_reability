@@ -4,30 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:med_reability/features/exercises/domain/entities/exercise.dart';
 import 'package:med_reability/features/exercises/domain/entities/exercise_type.dart';
 import 'package:med_reability/features/rehabilitation_plan/presentation/state/rehabilitation_program_editor_state.dart';
+import 'package:med_reability/features/rehabilitation_plan/presentation/widgets/rehabilitation_plan_dialog_frame.dart';
 import 'package:med_reability/utils/theme/app_theme.dart';
 import 'package:med_reability/utils/widgets/app_secondary_button.dart';
 import 'package:med_reability/utils/widgets/app_text_field.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
 
-Future<RehabilitationProgramExerciseDraft?>
-showRehabilitationExerciseSettingsDialog({
+Future<RehabilitationProgramExerciseDraft?> showRehabilitationExerciseSettingsDialog({
   required BuildContext context,
   required Exercise exercise,
   RehabilitationProgramExerciseDraft? initialValue,
 }) {
-  return showDialog<RehabilitationProgramExerciseDraft>(
+  return showRehabilitationPlanDialog<RehabilitationProgramExerciseDraft>(
     context: context,
-    barrierColor: Colors.black.withOpacity(0.12),
     builder: (context) {
-      return BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: 5,
-          sigmaY: 5,
-        ),
-        child: _RehabilitationExerciseSettingsDialog(
-          exercise: exercise,
-          initialValue: initialValue,
-        ),
+      return _RehabilitationExerciseSettingsDialog(
+        exercise: exercise,
+        initialValue: initialValue,
       );
     },
   );
@@ -95,25 +88,13 @@ class _RehabilitationExerciseSettingsDialogState
     final colors = context.appColors;
     final isRepetition = widget.exercise.type == ExerciseType.repetition;
 
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20),
-      backgroundColor: Colors.transparent,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(22, 24, 22, 24),
-        decoration: BoxDecoration(
-          color: colors.dialogBackground,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 24,
-              offset: const Offset(0, 8),
-              color: colors.dialogShadow,
-            ),
-          ],
-        ),
+    return RehabilitationPlanDialogFrame(
+      maxWidth: 520,
+      padding: const EdgeInsets.fromLTRB(22, 24, 22, 24),
+      child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               'Настроить упражнение',

@@ -7,12 +7,16 @@ import 'package:med_reability/utils/widgets/app_secondary_button.dart';
 import 'package:med_reability/utils/widgets/app_top_actions_bar.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
 
+import '../widgets/rehabilitation_plan_page_layout.dart';
+
 class RehabilitationAssignedExerciseDetailsPage extends StatefulWidget {
   final RehabilitationProgramExerciseDraft initialDraft;
+  final List<String> breadcrumbLabels;
 
   const RehabilitationAssignedExerciseDetailsPage({
     super.key,
     required this.initialDraft,
+    this.breadcrumbLabels = const [],
   });
 
   @override
@@ -61,49 +65,56 @@ class _RehabilitationAssignedExerciseDetailsPageState
       );
     }
 
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-          children: [
-            AppTopActionsBar(
-              onBack: () => Navigator.pop(context),
-              onNotify: () {},
-            ),
-            const SizedBox(height: 18),
-            ExerciseDetailsContent(
-              exercise: exercise,
-              showTypePill: false,
-              afterTitle: RehabilitationAssignedExerciseMetaCard(
-                draft: draft,
-              ),
-              bottomActions: Row(
-                children: [
-                  Expanded(
-                    child: SecondaryButton(
-                      text: 'Изменить',
-                      onPressed: _edit,
-                      height: 38,
-                      textStyle: Theme.of(context).textTheme.titleSmall,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: PrimaryButton(
-                      text: 'Сохранить',
-                      onPressed: () {
-                        Navigator.of(context).pop(draft);
-                      },
-                      height: 38,
-                      textStyle: Theme.of(context).textTheme.titleSmall,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+    final isDesktop = isRehabilitationPlanDesktopLayout(context);
+
+    final labels = widget.breadcrumbLabels.isNotEmpty
+        ? widget.breadcrumbLabels
+        : [
+      'Редактирование плана',
+      'Настройка упражнения',
+      exercise.name,
+    ];
+
+    return RehabilitationPlanPageLayout(
+      breadcrumbs: rehabilitationPlanBreadcrumbs(
+        context,
+        labels,
       ),
+      desktopHeaderSpacing: 22,
+      mobileHeaderSpacing: 18,
+      children: [
+        ExerciseDetailsContent(
+          exercise: exercise,
+          isDesktopLayout: isDesktop,
+          showTypePill: false,
+          afterTitle: RehabilitationAssignedExerciseMetaCard(
+            draft: draft,
+          ),
+          bottomActions: Row(
+            children: [
+              Expanded(
+                child: SecondaryButton(
+                  text: 'Изменить',
+                  onPressed: _edit,
+                  height: 38,
+                  textStyle: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: PrimaryButton(
+                  text: 'Сохранить',
+                  onPressed: () {
+                    Navigator.of(context).pop(draft);
+                  },
+                  height: 38,
+                  textStyle: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

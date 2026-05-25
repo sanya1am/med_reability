@@ -3,6 +3,7 @@ import 'package:med_reability/features/patient/presentation/page/patient_home_pa
 import 'package:med_reability/features/patient/presentation/page/patient_notifications_page.dart';
 import 'package:med_reability/features/patient/presentation/page/patient_shell_page.dart';
 import 'package:med_reability/features/patient/presentation/page/patient_trainings_page.dart';
+import '../../features/profile/presentation/page/edit_profile_page.dart';
 import 'app_route_names.dart';
 
 final patientShellRoute = StatefulShellRoute.indexedStack(
@@ -28,6 +29,13 @@ final patientShellRoute = StatefulShellRoute.indexedStack(
           path: '/patient/home',
           name: AppRouteNames.patientHome,
           builder: (context, state) => const PatientHomePage(),
+          routes: [
+            GoRoute(
+              path: 'edit-profile',
+              name: AppRouteNames.patientEditProfile,
+              builder: (context, state) => const EditProfilePage(),
+            ),
+          ],
         ),
       ],
     ),

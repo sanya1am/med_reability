@@ -28,7 +28,7 @@ class PatientShellPage extends ConsumerWidget {
     return switch (navigationShell.currentIndex) {
       0 => 'Тренировки',
       1 => 'Главная',
-      2 => 'Уведомления',
+      // 2 => 'Уведомления',
       _ => 'Главная',
     };
   }
@@ -98,10 +98,10 @@ class _PatientDesktopShell extends StatelessWidget {
                 icon: SvgPicture.asset(AppAssets.homeIcon),
                 label: 'Главная',
               ),
-              SideNavItem(
-                icon: SvgPicture.asset(AppAssets.notificationsIcon),
-                label: 'Уведомления',
-              ),
+              // SideNavItem(
+              //   icon: SvgPicture.asset(AppAssets.notificationsIcon),
+              //   label: 'Уведомления',
+              // ),
             ],
             footer: SecondaryButton(
               text: 'Выйти',
@@ -145,10 +145,10 @@ class _PatientMobileShell extends StatelessWidget {
               if (showMobileNav)
                 AppHeader(
                   title: title,
-                  actionIconWidget: SvgPicture.asset(
-                    AppAssets.notificationsIcon,
-                  ),
-                  onAction: () => onNavTap(2),
+                  // actionIconWidget: SvgPicture.asset(
+                  //   AppAssets.notificationsIcon,
+                  // ),
+                  // onAction: () => onNavTap(2),
                 ),
               Expanded(
                 child: navigationShell,

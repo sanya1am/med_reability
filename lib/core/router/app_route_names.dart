@@ -15,5 +15,11 @@ class AppRouteNames {
   static const adminDoctors = 'adminDoctors';
   static const adminPatients = 'adminPatients';
   static const adminHome = 'adminHome';
-  static const adminCreateUser = 'adminCreateUser';
+
+  static const adminDoctorsUserForm = 'adminDoctorsUserForm';
+  static const adminPatientsUserForm = 'adminPatientsUserForm';
+
+  static const adminEditProfile = 'adminEditProfile';
+  static const doctorEditProfile = 'doctorEditProfile';
+  static const patientEditProfile = 'patientEditProfile';
 }

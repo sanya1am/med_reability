@@ -38,8 +38,8 @@ class _DoctorMobileMainPageState extends ConsumerState<DoctorMobileMainPage> {
             children: [
               AppHeader(
                 title: title,
-                actionIconWidget: SvgPicture.asset(AppAssets.notificationsIcon),
-                onAction: () {},
+                // actionIconWidget: SvgPicture.asset(AppAssets.notificationsIcon),
+                // onAction: () {},
               ),
               Expanded(
                 child: IndexedStack(

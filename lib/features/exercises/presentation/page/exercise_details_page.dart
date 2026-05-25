@@ -146,7 +146,6 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
               children: [
                 AppTopActionsBar(
                   onBack: () => Navigator.pop(context),
-                  onNotify: () {},
                 ),
                 const SizedBox(height: 40),
                 Text(
@@ -236,7 +235,6 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
               children: [
                 AppTopActionsBar(
                   onBack: () => Navigator.pop(context),
-                  onNotify: () {},
                 ),
                 const SizedBox(height: 16),
                 ExerciseDetailsContent(

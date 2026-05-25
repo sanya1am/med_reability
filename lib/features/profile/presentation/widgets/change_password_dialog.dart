@@ -6,6 +6,9 @@ import 'package:med_reability/utils/widgets/app_secondary_button.dart';
 import 'package:med_reability/utils/widgets/app_text_field.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
 
+import '../../../../utils/validation/password_validator.dart';
+import '../../../../utils/widgets/password_requirements_text.dart';
+
 Future<bool?> showChangePasswordDialog({
   required BuildContext context,
   required Future<String?> Function(
@@ -63,7 +66,23 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
   String? errorText;
 
   @override
+  void initState() {
+    super.initState();
+    newCtrl.addListener(_onPasswordChanged);
+    repeatCtrl.addListener(_onPasswordChanged);
+  }
+
+  void _onPasswordChanged() {
+    if (!mounted) return;
+    setState(() {
+      errorText = null;
+    });
+  }
+
+  @override
   void dispose() {
+    newCtrl.removeListener(_onPasswordChanged);
+    repeatCtrl.removeListener(_onPasswordChanged);
     currentCtrl.dispose();
     newCtrl.dispose();
     repeatCtrl.dispose();
@@ -71,13 +90,22 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
   }
 
   Future<void> _submit() async {
-    final current = currentCtrl.text.trim();
-    final next = newCtrl.text.trim();
-    final repeat = repeatCtrl.text.trim();
+    final current = currentCtrl.text;
+    final next = newCtrl.text;
+    final repeat = repeatCtrl.text;
 
     if (current.isEmpty || next.isEmpty || repeat.isEmpty) {
       setState(() {
         errorText = 'Заполните все поля';
+      });
+      return;
+    }
+
+    final passwordValidation = PasswordValidator.validate(next);
+
+    if (!passwordValidation.isValid) {
+      setState(() {
+        errorText = passwordValidation.errorText;
       });
       return;
     }
@@ -185,6 +213,11 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                             });
                           },
                         ),
+
+                        PasswordRequirementsText(
+                          password: newCtrl.text,
+                        ),
+
                         const SizedBox(height: 18),
 
                         _PasswordInputBlock(

@@ -12,6 +12,7 @@ import 'package:med_reability/utils/widgets/app_top_actions_bar.dart';
 import 'package:med_reability/utils/widgets/primary_button.dart';
 
 import '../../../../utils/widgets/app_secondary_button.dart';
+import '../widgets/rehabilitation_plan_page_layout.dart';
 
 class RehabilitationProgramDayEditorPage extends ConsumerWidget {
   final RehabilitationProgramEditorArgs args;
@@ -47,95 +48,130 @@ class RehabilitationProgramDayEditorPage extends ConsumerWidget {
 
     final day = week.days[dayIndex];
 
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(22, 16, 22, 32),
-          children: [
-            AppTopActionsBar(
-              onBack: () => Navigator.pop(context),
-              onNotify: () {},
+    final planTitle = state.isEdit ? 'Редактирование плана' : 'Создание плана';
+
+    final dayBreadcrumbLabels = [
+      planTitle,
+      'Недели',
+      'Неделя ${weekIndex + 1}',
+      'День ${day.dayNumber}',
+    ];
+
+    return RehabilitationPlanPageLayout(
+      breadcrumbs: rehabilitationPlanBreadcrumbs(
+        context,
+        [
+          state.isEdit ? 'Редактирование плана' : 'Создание плана',
+          'Неделя ${weekIndex + 1}',
+          'День ${day.dayNumber}',
+        ],
+      ),
+      desktopHeaderSpacing: 28,
+      mobileHeaderSpacing: 28,
+      mobilePadding: const EdgeInsets.fromLTRB(22, 16, 22, 32),
+      children: [
+        RehabilitationPlanSwitcher(
+          title: 'День ${day.dayNumber}',
+          canGoPrevious: dayIndex > 0,
+          canGoNext: dayIndex < week.days.length - 1,
+          onPrevious: () => _replaceWithDay(context, dayIndex - 1),
+          onNext: () => _replaceWithDay(context, dayIndex + 1),
+        ),
+
+        const SizedBox(height: 24),
+
+        if (day.exercises.isEmpty)
+          SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.62,
+            child: Center(
+              child: RehabilitationEmptyDayState(
+                onAddExercise: () => _addExercise(
+                  context,
+                  vm,
+                  breadcrumbLabels: [
+                    ...dayBreadcrumbLabels,
+                    'Добавить упражнение',
+                  ],
+                ),
+              ),
             ),
+          )
+        else ...[
+          ...List.generate(day.exercises.length, (exerciseIndex) {
+            return RehabilitationDayExerciseCard(
+              item: day.exercises[exerciseIndex],
+              onEdit: () async {
+                final updated = await Navigator.of(context)
+                    .push<RehabilitationProgramExerciseDraft>(
+                  MaterialPageRoute(
+                    builder: (_) => RehabilitationAssignedExerciseDetailsPage(
+                      initialDraft: day.exercises[exerciseIndex],
+                      breadcrumbLabels: [
+                        ...dayBreadcrumbLabels,
+                        'Настройка упражнения',
+                      ],
+                    ),
+                  ),
+                );
 
-            const SizedBox(height: 28),
+                if (updated == null) return;
 
-            RehabilitationPlanSwitcher(
-              title: 'День ${day.dayNumber}',
-              canGoPrevious: dayIndex > 0,
-              canGoNext: dayIndex < week.days.length - 1,
-              onPrevious: () => _replaceWithDay(context, dayIndex - 1),
-              onNext: () => _replaceWithDay(context, dayIndex + 1),
-            ),
+                vm.updateExerciseInDay(
+                  weekIndex: weekIndex,
+                  dayIndex: dayIndex,
+                  exerciseIndex: exerciseIndex,
+                  exercise: updated,
+                );
+              },
+            );
+          }),
 
-            const SizedBox(height: 24),
+          const SizedBox(height: 12),
 
-            if (day.exercises.isEmpty)
-              RehabilitationEmptyDayState(
-                onAddExercise: () => _addExercise(context, vm),
-              )
-            else ...[
-              ...List.generate(day.exercises.length, (exerciseIndex) {
-                return RehabilitationDayExerciseCard(
-                  item: day.exercises[exerciseIndex],
-                  onEdit: () async {
-                    final updated = await Navigator.of(context)
-                        .push<RehabilitationProgramExerciseDraft>(
+          Row(
+            children: [
+              Expanded(
+                child: SecondaryButton(
+                  text: 'Удалить',
+                  onPressed: () async {
+                    await Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => RehabilitationAssignedExerciseDetailsPage(
-                          initialDraft: day.exercises[exerciseIndex],
+                        builder: (_) => RehabilitationDayExerciseDeletePage(
+                          args: args,
+                          weekIndex: weekIndex,
+                          dayIndex: dayIndex,
+                          breadcrumbLabels: [
+                            ...dayBreadcrumbLabels,
+                            'Удаление упражнений',
+                          ],
                         ),
                       ),
                     );
-
-                    if (updated == null) return;
-
-                    vm.updateExerciseInDay(
-                      weekIndex: weekIndex,
-                      dayIndex: dayIndex,
-                      exerciseIndex: exerciseIndex,
-                      exercise: updated,
-                    );
                   },
-                );
-              }),
-
-              const SizedBox(height: 12),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: SecondaryButton(
-                      text: 'Удалить',
-                      onPressed: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => RehabilitationDayExerciseDeletePage(
-                              args: args,
-                              weekIndex: weekIndex,
-                              dayIndex: dayIndex,
-                            ),
-                          ),
-                        );
-                      },
-                      height: 38,
-                      textStyle: Theme.of(context).textTheme.titleSmall,
-                    ),
+                  height: 38,
+                  textStyle: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: PrimaryButton(
+                  text: 'Добавить',
+                  onPressed: () => _addExercise(
+                    context,
+                    vm,
+                    breadcrumbLabels: [
+                      ...dayBreadcrumbLabels,
+                      'Добавить упражнение',
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: PrimaryButton(
-                      text: 'Добавить',
-                      onPressed: () => _addExercise(context, vm),
-                      height: 38,
-                      textStyle: Theme.of(context).textTheme.titleSmall,
-                    ),
-                  ),
-                ],
+                  height: 38,
+                  textStyle: Theme.of(context).textTheme.titleSmall,
+                ),
               ),
             ],
-          ],
-        ),
-      ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -153,12 +189,15 @@ class RehabilitationProgramDayEditorPage extends ConsumerWidget {
 
   Future<void> _addExercise(
       BuildContext context,
-      RehabilitationProgramEditorViewModel vm,
-      ) async {
+      RehabilitationProgramEditorViewModel vm, {
+        required List<String> breadcrumbLabels,
+      }) async {
     final draft = await Navigator.of(context)
         .push<RehabilitationProgramExerciseDraft>(
       MaterialPageRoute(
-        builder: (_) => const RehabilitationExercisePickerPage(),
+        builder: (_) => RehabilitationExercisePickerPage(
+          breadcrumbLabels: breadcrumbLabels,
+        ),
       ),
     );
 

@@ -3,6 +3,7 @@ import 'package:med_reability/core/errors/unauthorized_exception.dart';
 import 'package:med_reability/features/auth/domain/entities/role.dart';
 import '../../../../core/services/token_storage.dart';
 import '../../domain/entities/clinic_user.dart';
+import '../../domain/entities/user_image_file.dart';
 import '../../domain/repositories/users_repository.dart';
 import '../models/users_dto.dart';
 
@@ -57,6 +58,7 @@ class UsersRepositoryImpl implements UsersRepository {
     required String lastName,
     required String phoneNumber,
     required UserRole role,
+    UserImageFile? image,
   }) async {
     try {
       final formData = FormData.fromMap({
@@ -67,6 +69,11 @@ class UsersRepositoryImpl implements UsersRepository {
         'lastName': lastName,
         'phoneNumber': phoneNumber,
         'role': role.name,
+        if (image != null)
+          'image': MultipartFile.fromBytes(
+            image.bytes,
+            filename: image.name,
+          ),
       });
       final res = await _dio.post(
         '/api/users',
@@ -75,19 +82,6 @@ class UsersRepositoryImpl implements UsersRepository {
           contentType: 'multipart/form-data',
         ),
       );
-      // final res = await _dio.post(
-      //   '/api/users',
-      //   data: createUserBody(
-      //     email: email,
-      //     password: password,
-      //     firstName: firstName,
-      //     patronymic: patronymic,
-      //     lastName: lastName,
-      //     phoneNumber: phoneNumber,
-      //     role: role,
-      //   ),
-      //   options: await _authOptions(),
-      // );
 
       final dto = ClinicUserDto.fromJson(res.data as Map<String, dynamic>);
       return dto.toEntity();
@@ -104,6 +98,38 @@ class UsersRepositoryImpl implements UsersRepository {
       if (code == 403) throw Exception('Недостаточно прав.');
       throw Exception('Не удалось создать пользователя');
     }
+  }
+
+  @override
+  Future<void> updateUser({
+    required String id,
+    required String email,
+    required String firstName,
+    required String patronymic,
+    required String lastName,
+    required String phoneNumber,
+    UserImageFile? image,
+  }) async {
+    final formData = FormData.fromMap({
+      'Email': email,
+      'FirstName': firstName,
+      'Patronymic': patronymic,
+      'LastName': lastName,
+      'PhoneNumber': phoneNumber,
+      if (image != null)
+        'Image': MultipartFile.fromBytes(
+          image.bytes,
+          filename: image.name,
+        ),
+    });
+
+    await _dio.put(
+      '/api/users/$id',
+      data: formData,
+      options: await _authOptions(
+        contentType: 'multipart/form-data',
+      ),
+    );
   }
 
   @override

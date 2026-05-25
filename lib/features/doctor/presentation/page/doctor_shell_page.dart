@@ -23,8 +23,8 @@ class DoctorShellPage extends ConsumerWidget {
   bool get _isRootLocation {
     return location == '/doctor/patients' ||
         location == '/doctor/exercises' ||
-        location == '/doctor/home' ||
-        location == '/doctor/notifications';
+        location == '/doctor/home';
+        // || location == '/doctor/notifications';
   }
 
   String get _title {
@@ -32,7 +32,7 @@ class DoctorShellPage extends ConsumerWidget {
       0 => 'Пациенты',
       1 => 'Упражнения',
       2 => 'Главная',
-      3 => 'Уведомления',
+      // 3 => 'Уведомления',
       _ => 'Главная',
     };
   }
@@ -95,21 +95,21 @@ class _DoctorDesktopShell extends StatelessWidget {
             onTap: onNavTap,
             items: [
               SideNavItem(
-                icon: SvgPicture.asset(AppAssets.listIcon),
+                icon: SvgPicture.asset(AppAssets.heartIcon),
                 label: 'Пациенты',
               ),
               SideNavItem(
-                icon: SvgPicture.asset(AppAssets.heartIcon),
+                icon: SvgPicture.asset(AppAssets.listIcon),
                 label: 'Упражнения',
               ),
               SideNavItem(
                 icon: SvgPicture.asset(AppAssets.homeIcon),
                 label: 'Главная',
               ),
-              SideNavItem(
-                icon: SvgPicture.asset(AppAssets.notificationsIcon),
-                label: 'Уведомления',
-              ),
+              // SideNavItem(
+              //   icon: SvgPicture.asset(AppAssets.notificationsIcon),
+              //   label: 'Уведомления',
+              // ),
             ],
             footer: SecondaryButton(
               text: 'Выйти',
@@ -153,10 +153,10 @@ class _DoctorMobileShell extends StatelessWidget {
               if (showMobileNav)
                 AppHeader(
                   title: title,
-                  actionIconWidget: SvgPicture.asset(
-                    AppAssets.notificationsIcon,
-                  ),
-                  onAction: () {},
+                  // actionIconWidget: SvgPicture.asset(
+                  //   AppAssets.notificationsIcon,
+                  // ),
+                  // onAction: () {},
                 ),
               Expanded(
                 child: navigationShell,

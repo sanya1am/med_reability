@@ -6,7 +6,6 @@ import 'package:med_reability/features/doctor/presentation/widgets/patient_card.
 import 'package:med_reability/utils/theme/app_theme.dart';
 import '../../../../utils/widgets/app_text_field.dart';
 import '../view_model/doctor_patients_view_model.dart';
-import 'doctor_patient_overview_page.dart';
 
 
 class DoctorPatientsPage extends ConsumerStatefulWidget {
@@ -62,7 +61,7 @@ class _DoctorPatientsPageState extends ConsumerState<DoctorPatientsPage> {
                             Icon(
                               Icons.info_outline,
                               size: 40,
-                              color: colors.textPrimary,
+                              color: appPrimaryBlue,
                             ),
                             const SizedBox(height: 10),
                             Text(
@@ -136,23 +135,18 @@ class _DoctorPatientsPageState extends ConsumerState<DoctorPatientsPage> {
                   PatientCard(
                     name: p.fullName,
                     subtitle: p.phoneNumber,
+                    imageUrl: p.imageUrl,
                     hasPlan: p.hasPlan,
-                    onTap: () {
-                      // debugPrint('OPEN PATIENT OVERVIEW: id=${p.patientId}, name=${p.fullName}');
-
-                      context.pushNamed(
+                    onTap: () async {
+                      await context.pushNamed(
                         AppRouteNames.doctorPatientOverview,
                         pathParameters: {
                           'patientId': p.patientId,
                         },
                       );
-                      // Navigator.of(context).push(
-                      //   MaterialPageRoute(
-                      //     builder: (_) => DoctorPatientOverviewPage(
-                      //       patientId: p.patientId,
-                      //     ),
-                      //   ),
-                      // );
+                      if (!context.mounted) return;
+
+                      await ref.read(doctorPatientsViewModelProvider.notifier).refresh();
                     },
                   ),
                 ),

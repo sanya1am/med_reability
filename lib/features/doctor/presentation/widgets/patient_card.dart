@@ -7,6 +7,7 @@ import '../../../../utils/assets/app_assets.dart';
 class PatientCard extends StatelessWidget {
   final String name;
   final String subtitle;
+  final String? imageUrl;
   final bool hasPlan;
   final VoidCallback? onTap;
 
@@ -15,6 +16,7 @@ class PatientCard extends StatelessWidget {
     required this.name,
     required this.subtitle,
     required this.hasPlan,
+    this.imageUrl,
     this.onTap,
   });
 
@@ -43,15 +45,12 @@ class PatientCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundColor: colors.surfaceAlt,
-              child: Icon(
-                Icons.person,
-                color: colors.textPrimary,
-              ),
+            _PatientAvatar(
+              imageUrl: imageUrl,
             ),
+
             const SizedBox(width: 12),
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,6 +69,7 @@ class PatientCard extends StatelessWidget {
                 ],
               ),
             ),
+
             if (!hasPlan) ...[
               const SizedBox(width: 12),
               SvgPicture.asset(
@@ -80,6 +80,45 @@ class PatientCard extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _PatientAvatar extends StatelessWidget {
+  final String? imageUrl;
+
+  const _PatientAvatar({
+    required this.imageUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final url = imageUrl;
+
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: colors.surfaceAlt,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: url == null || url.isEmpty
+          ? Icon(
+        Icons.person,
+        color: colors.textPrimary,
+      )
+          : Image.network(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) {
+          return Icon(
+            Icons.person,
+            color: colors.textPrimary,
+          );
+        },
       ),
     );
   }
